@@ -70,6 +70,10 @@ Improvements to clang-tidy
 New checks
 ^^^^^^^^^^
 
+- New :doc:`bsl-literals-uppercase-suffix
+  <clang-tidy/checks/bsl-literals-uppercase-suffix>` check.
+
+  Checks that each integer literal has an uppercase integer suffix.
 - New :doc:`bugprone-misplaced-pointer-arithmetic-in-alloc
   <clang-tidy/checks/bugprone-misplaced-pointer-arithmetic-in-alloc>` check.
 
