@@ -70,6 +70,11 @@ Improvements to clang-tidy
 New checks
 ^^^^^^^^^^
 
+- New :doc:`bsl-literals-ascii-only
+  <clang-tidy/checks/bsl-literals-ascii-only>` check.
+
+  Ensures only ASCII-encoded string literals are used.
+
 - New :doc:`bsl-literals-no-octal
   <clang-tidy/checks/bsl-literals-no-octal>` check.
 
