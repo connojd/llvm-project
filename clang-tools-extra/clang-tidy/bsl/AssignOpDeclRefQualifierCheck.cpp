@@ -17,20 +17,23 @@ namespace tidy {
 namespace bsl {
 
 void AssignOpDeclRefQualifierCheck::registerMatchers(MatchFinder *Finder) {
-  Finder->addMatcher(cxxMethodDecl(hasAnyOverloadedOperatorName(
-                                       "=", "+=", "-=", "*=", "/=", "%=", "^=",
-                                       "&=", "|=", ">>=", "<<="))
-                         .bind("assign"),
-                     this);
+  Finder->addMatcher(
+    cxxMethodDecl(
+      hasAnyOverloadedOperatorName("=", "+=", "-=", "*=", "/=", "%=", "^=", "&=", "|=", ">>=", "<<="),
+      unless(
+        isImplicit()
+      )
+    ).bind("assign"),
+    this
+  );
 }
 
 void AssignOpDeclRefQualifierCheck::check(
     const MatchFinder::MatchResult &Result) {
   const auto *MatchedDecl = Result.Nodes.getNodeAs<CXXMethodDecl>("assign");
-  if (MatchedDecl->getRefQualifier() == RQ_LValue)
-    return;
-  diag(MatchedDecl->getLocation(),
-       "assignment operators should be declared with the ref-qualifier &");
+  if (MatchedDecl->getRefQualifier() == RQ_None)
+    diag(MatchedDecl->getLocation(),
+        "assignment operators should be declared with the ref-qualifier &");
 }
 
 } // namespace bsl
