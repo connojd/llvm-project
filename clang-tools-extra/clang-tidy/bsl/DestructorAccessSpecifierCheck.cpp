@@ -16,6 +16,10 @@ namespace clang {
 namespace tidy {
 namespace bsl {
 
+AST_MATCHER(CXXDestructorDecl, isUnion) {
+  return Node.getParent()->isUnion();
+}
+
 AST_MATCHER(CXXDestructorDecl, isPublicVirtual) {
   return Node.getAccess() == AS_public && Node.isVirtual();
 }
@@ -25,10 +29,17 @@ AST_MATCHER(CXXDestructorDecl, isProtectedNonVirtual) {
 }
 
 void DestructorAccessSpecifierCheck::registerMatchers(MatchFinder *Finder) {
-  Finder->addMatcher(cxxDestructorDecl(unless(anyOf(isPublicVirtual(),
-                                                    isProtectedNonVirtual())))
-                         .bind("destructor"),
-                     this);
+  Finder->addMatcher(
+    cxxDestructorDecl(
+      unless(
+        anyOf(
+          isUnion(),
+          isPublicVirtual(),
+          isProtectedNonVirtual()
+        )
+      )
+    ).bind("destructor"),
+    this);
 }
 
 void DestructorAccessSpecifierCheck::check(
