@@ -30,15 +30,6 @@ class Pod {
   int b;
 };
 
-struct NonPodStruct {
-  // CHECK-MESSAGES: :[[@LINE-1]]:8: warning: non-POD type should be defined as a class [bsl-non-pod-classdef]
-public:
-  int a;
-
-private:
-  int b;
-};
-
 class test final {
   bool var{};
 
