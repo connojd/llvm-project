@@ -47,7 +47,7 @@ void StructDefCheck::registerMatchers(MatchFinder *Finder) {
       cxxRecordDecl(hasDefinition(), isStruct(), hasBases()).bind("base"),
       this);
   Finder->addMatcher(
-      cxxRecordDecl(hasDefinition(), isStruct(), unless(isFinal()))
+      cxxRecordDecl(hasDefinition(), isStruct(), unless(anyOf(isFinal(), isImplicit())))
           .bind("final"),
       this);
 }
