@@ -1,162 +1,298 @@
-// // RUN: %check_clang_tidy %s bsl-using-ident-unique-namespace %t
-// #include <cstdint>
+// RUN: %check_clang_tidy %s bsl-using-ident-unique-namespace %t
+
+using type1 = int;
+using _reserved1 = int;
+void foo1(int);
+template<typename T, int I>
+void templateFoo1(int);
+template<typename T, int I>
+using templateType1 = int;
+class c1{};
+struct s1{};
+enum e1{};
+union u1{};
+
+// detect function names?
 
 namespace n1
 {
-	using func = void (*)(int, int);
-	void f1()
+	using _reserved1 = int; // Compliant by exception
+
+	void foo2(int type1); // Compliant
+
+	template<typename T, int I>
+	void templateFoo2(int type1); // Compliant
+
+	void foo3()
 	{
-		using func = void (*)(void); // Non-compliant, reuses func identifier declared in the same namespace
-		// CHECK-MESSAGES: [[@LINE-1]]:3: warning: func already used in namespace 'n1' at line 6 [bsl-using-ident-unique-namespace]
+		int type1; // Compliant
 	}
-
-	template <class T>
-	using ptr = T*;
-	// using ptr = int*;
-	using myptr = int*;
-
-	template <class T>
-	void f2() {
-		using ptr = T*;		// Non-compliant
-		// CHECK-MESSAGES: [[@LINE-1]]:3: warning: ptr already used in namespace 'n1' at line 14 [bsl-using-ident-unique-namespace]
-	}
-
-	class Foo {
-	private:
-		void func(){};		// Compliant
-	};
-
-	struct Bar {
-		void func(){};		// Compliant
-	};
 }
+
+namespace n1
+{
+	template<typename T, int I>
+	using templateType1 = int;
+	// CHECK-MESSAGES: [[@LINE-1]]:8: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+	template<typename T, int I>
+	using templateType2 = int; // Compliant
+}
+
+namespace n1
+{
+	class c1{};
+	// CHECK-MESSAGES: [[@LINE-1]]:8: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+	struct s1{};
+	// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+	enum e1{};
+	// CHECK-MESSAGES: [[@LINE-1]]:7: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+	union u1{};
+	// CHECK-MESSAGES: [[@LINE-1]]:8: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+}
+
+namespace n1
+{
+	using type1 = int;
+	// CHECK-MESSAGES: [[@LINE-1]]:8: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+	using type2 = int; // Compliant
+
+	namespace n1n1
+	{
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	namespace n1n2
+	{
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	class n1c1
+	{
+	public:
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	class n1c2
+	{
+	public:
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	struct n1s1
+	{
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	struct n1s2
+	{
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+};
 
 namespace n2
 {
-	using func = void (*)(int, int); // Compliant, reuses func identifier but in another namespace
-	template <class T>
-	using ptr = T*;
-	using myptr = int*;
+	using type1 = int;
+	// CHECK-MESSAGES: [[@LINE-1]]:8: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+	using type2 = int; // Compliant
+
+	namespace n2n1
+	{
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	namespace n2n2
+	{
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	class n2c1
+	{
+	public:
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	class n2c2
+	{
+	public:
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	struct n2s1
+	{
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+
+	struct n2s2
+	{
+		using type1 = int;
+		// CHECK-MESSAGES: [[@LINE-1]]:9: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
+
+		using type3 = int; // Compliant
+	};
+};
+
+class myclass_base
+{
+public:
+	myclass_base() = default;
+	~myclass_base() = default;
+	myclass_base(myclass_base const &) = default;
+	myclass_base &operator=(myclass_base const &) = default;
+	myclass_base(myclass_base &&) = default;
+	myclass_base &operator=(myclass_base &&) = default;
+};
+
+class prototypeTest1;
+class prototypeTest1{};
+
+template<typename T>
+class templateClass
+{
+	using templateClassType = T;
+};
+
+templateClass<int> templateClassTest1;
+templateClass<bool> templateClassTest2;
+
+template<typename T>
+bool templateFunc1()
+{
+	using templateFuncType = T;
+	return true;
 }
 
+auto templateFuncTest1{templateFunc1<int>()};
+auto templateFuncTest2{templateFunc1<bool>()};
 
-namespace n3
+template<typename T>
+bool templateFunc2(int)
 {
-	using func = void (*)(int, int);
-	namespace n4
+	return true;
+}
+
+template<typename T>
+bool templateFunc2(bool)
+{
+	return true;
+}
+
+namespace n1
+{
+	template<typename T>
+	bool templateFunc1()
+	// CHECK-MESSAGES: [[@LINE-1]]:7: warning: A user-defined type name shall be a unique identifier within a namespace [bsl-using-ident-unique-namespace]
 	{
-		using func = void (*)(int, int); // Non-compliant; nested namespace
-		// CHECK-MESSAGES: [[@LINE-1]]:3: warning: func already used in namespace 'n3' at line 45 [bsl-using-ident-unique-namespace]
-		namespace n5 {
-			using func = void (*)(int);	 // Non-compliant
-			// CHECK-MESSAGES: [[@LINE-1]]:4: warning: func already used in namespace 'n3::n4' at line 48 [bsl-using-ident-unique-namespace]
-		}
+		return true;
 	}
 }
 
+template<template<class...> class C>
+class templateTemplateClass
+{};
 
-namespace n5
+using templateTemplateClassTest = templateTemplateClass<templateClass>;
+
+template<bool B, typename T = void>
+struct enable_if final
+{};
+
+template<typename T>
+struct enable_if<true, T> final
 {
-	template <typename T>
-	using myType = T;
+	using type = T;
+};
 
-	template <typename T>
-	void f1()
-	{
-		using myType = T;		// Non-compliant
-		// CHECK-MESSAGES: [[@LINE-1]]:3: warning: myType already used in namespace 'n5' at line 61 [bsl-using-ident-unique-namespace]
-	}
+template<bool B, typename T = void>
+using enable_if_t = typename enable_if<B, T>::type;
 
-
-	// // template <typename T> using Y = void <typename T> f();
-	// // template <typename T> 
-	// void foo() {};
-	// template <typename T> using f = foo;
-	// void f1()
-	// {
-	// 	template <typename T> using Y = void <typename T> f();
-	// }
-}
-
-using func2 = void (*)(int, int);
-// class and struct tests
-namespace n6{
-	using func2 = void (*)(int, int);
-	// CHECK-MESSAGES: [[@LINE-1]]:2: warning: func2 already used in the global namespace at line 81 [bsl-using-ident-unique-namespace]
-	using func = void (*)(int, int);
-	class Outer {
-		using func = void (*)(int, int);
-		// CHECK-MESSAGES: [[@LINE-1]]:3: warning: func already used in namespace 'n6' at line 86 [bsl-using-ident-unique-namespace]
-
-		class Inner{
-			using func = void (*)(int, int);
-			// CHECK-MESSAGES: [[@LINE-1]]:4: warning: func already used in namespace 'n6' at line 88 [bsl-using-ident-unique-namespace]
-
-		};
-	};
-
-	class Outer2 {
-		using func3 = void (*)(int, int);
-		class Inner2{
-			using func3 = void (*)(int, int);
-			// CHECK-MESSAGES: [[@LINE-1]]:4: warning: func3 already used in namespace 'n6' at line 99 [bsl-using-ident-unique-namespace]
-
-		};
-	};
-
-	struct Outer3 {
-		using func3 = void (*)(int, int);	// does not collide with Outer2::func3
-		struct Inner3{
-			using func3 = void (*)(int, int);
-			// CHECK-MESSAGES: [[@LINE-1]]:4: warning: func3 already used in namespace 'n6' at line 108 [bsl-using-ident-unique-namespace]
-
-		};
-	};
-}
-
-namespace n7
+template<typename T, T v>
+class integral_constant
 {
-    class foo{};
-    namespace n2
-    {
-        using foo = void (*)(int, int);		// Non-compliant
-        // CHECK-MESSAGES: [[@LINE-1]]:9: warning: foo already used in namespace 'n7' at line 119 [bsl-using-ident-unique-namespace]
-    }
-}
+public:
+	static constexpr T value{v};
+};
 
-namespace n8
+template<bool B>
+using bool_constant = integral_constant<bool, B>;
+
+using true_type = bool_constant<true>;
+using false_type = bool_constant<false>;
+
+template<typename T, typename U>
+class is_same final : public false_type
+{};
+
+template<typename T>
+class is_same<T, T> final : public true_type
+{};
+
+template<          // --
+	typename T,    // --
+	enable_if_t<is_same<T, bool>::value, bool> = true>
+[[nodiscard]] constexpr auto
+foo() noexcept -> bool
 {
-    class foo{};
-    namespace n2
-    {
-        class foo{};	// Non-compliant
-        // CHECK-MESSAGES: [[@LINE-1]]:9: warning: foo already used in namespace 'n8' at line 129 [bsl-using-ident-unique-namespace]
-    }
+	return true;
 }
 
-namespace n9
+template<          // --
+	typename T,    // --
+	enable_if_t<!is_same<T, bool>::value, bool> = true>
+[[nodiscard]] constexpr auto
+foo() noexcept -> bool
 {
-    enum foo{};
-    namespace n2
-    {
-        class foo{};	// Non-compliant
-        // CHECK-MESSAGES: [[@LINE-1]]:9: warning: foo already used in namespace 'n9' at line 139 [bsl-using-ident-unique-namespace]
-    }
-    namespace n3
-    {
-    	struct foo{};	// Non-compliant
-    	// CHECK-MESSAGES: [[@LINE-1]]:6: warning: foo already used in namespace 'n9' at line 139 [bsl-using-ident-unique-namespace]
-    }
+	return false;
 }
 
-// // // already not allowed by clang
-// class Type {};
+auto bar{foo<bool>()};
 
-// template <class T>
-// using Type = T;
+class classWithConstructors
+{
+public:
+	classWithConstructors()
+	{}
 
-// struct Type { }; // Non-compliant, Type name reused
-// enum class Type : int { }; // Non-compliant, Type name reused
-// union Type {};
-// typedef int Type;
-// // using Type = 3;
+	classWithConstructors(int val)
+	{}
+
+	template<typename T>
+	classWithConstructors(T val) = delete;
+};
+
+classWithConstructors classWithConstructorsTest;

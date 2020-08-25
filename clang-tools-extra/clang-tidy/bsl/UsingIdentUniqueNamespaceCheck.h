@@ -17,10 +17,6 @@ namespace clang {
 namespace tidy {
 namespace bsl {
 
-/// Check that a "using" name is a unique identifier in a namespace
-///
-/// For the user-facing documentation see:
-/// http://clang.llvm.org/extra/clang-tidy/checks/bsl-using-ident-unique-namespace.html
 class UsingIdentUniqueNamespaceCheck : public ClangTidyCheck {
 public:
   UsingIdentUniqueNamespaceCheck(StringRef Name, ClangTidyContext *Context)
@@ -29,9 +25,14 @@ public:
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
 
 private:
-  std::unordered_map<const DeclContext *, std::unordered_map<std::string, SourceLocation>> namespaceToIDs;
-};
+  struct record_t
+  {
+    std::string spec;
+    SourceLocation loc;
+  };
 
+  std::unordered_map<std::string, std::list<record_t>> m_ids;
+};
 
 } // namespace bsl
 } // namespace tidy
