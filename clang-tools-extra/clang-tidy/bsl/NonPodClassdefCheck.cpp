@@ -24,9 +24,6 @@ void NonPodClassdefCheck::registerMatchers(MatchFinder *Finder) {
                      hasParent(cxxRecordDecl(isClass(), unless(isPOD()))))
           .bind("private"),
       this);
-
-  Finder->addMatcher(
-      cxxRecordDecl(hasDefinition(), unless(isClass())).bind("class"), this);
 }
 
 void NonPodClassdefCheck::check(const MatchFinder::MatchResult &Result) {
@@ -37,19 +34,6 @@ void NonPodClassdefCheck::check(const MatchFinder::MatchResult &Result) {
     if (Loc.isInvalid() || Loc.isMacroID())
       return;
     diag(Loc, "non-POD class types should have private member data");
-  }
-
-  // Class non-POD type
-  auto NonPodClass = Result.Nodes.getNodeAs<CXXRecordDecl>("class");
-
-  if (NonPodClass) {
-    auto PodLoc = NonPodClass->getLocation();
-    if (PodLoc.isInvalid() || PodLoc.isMacroID())
-      return;
-    if (NonPodClass->isPOD())
-      return;
-    else
-      diag(PodLoc, "non-POD type should be defined as a class");
   }
 }
 
