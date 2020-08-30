@@ -7,8 +7,8 @@ add_libc_unittest(
   SRCS
     raise_test.cpp
   DEPENDS
-    raise
-    signal_h
+    libc.include.signal
+    libc.src.signal.raise
 )
 
 add_libc_unittest(
@@ -18,12 +18,11 @@ add_libc_unittest(
   SRCS
     sigaction_test.cpp
   DEPENDS
-    sigaction
-    raise
-    signal_h
-    errno_h
-    __errno_location
-    __restore
+    libc.include.errno
+    libc.include.signal
+    libc.src.signal.raise
+    libc.src.signal.sigaction
+    libc.test.errno_setter_matcher
 )
 
 add_libc_unittest(
@@ -33,12 +32,13 @@ add_libc_unittest(
   SRCS
     sigprocmask_test.cpp
   DEPENDS
-    raise
-    sigprocmask
-    sigaddset
-    sigemptyset
-    signal_h
-    __errno_location
+    libc.include.errno
+    libc.src.errno.__errno_location
+    libc.src.signal.raise
+    libc.src.signal.sigaddset
+    libc.src.signal.sigemptyset
+    libc.src.signal.sigprocmask
+    libc.test.errno_setter_matcher
 )
 
 add_libc_unittest(
@@ -48,7 +48,54 @@ add_libc_unittest(
   SRCS
     sigaddset_test.cpp
   DEPENDS
-    sigaddset
-    signal_h
-    __errno_location
+    libc.include.errno
+    libc.include.signal
+    libc.src.signal.sigaddset
+    libc.test.errno_setter_matcher
+)
+
+add_libc_unittest(
+  signal_test
+  SUITE
+    libc_signal_unittests
+  SRCS
+    signal_test.cpp
+  DEPENDS
+    libc.include.errno
+    libc.include.signal
+    libc.src.errno.__errno_location
+    libc.src.signal.raise
+    libc.src.signal.signal
+    libc.test.errno_setter_matcher
+)
+
+add_libc_unittest(
+  sigfillset_test
+  SUITE
+    libc_signal_unittests
+  SRCS
+    sigfillset_test.cpp
+  DEPENDS
+    libc.include.errno
+    libc.include.signal
+    libc.src.signal.raise
+    libc.src.signal.sigfillset
+    libc.src.signal.sigprocmask
+    libc.test.errno_setter_matcher
+)
+
+add_libc_unittest(
+  sigdelset_test
+  SUITE
+    libc_signal_unittests
+  SRCS
+    sigdelset_test.cpp
+  DEPENDS
+    libc.include.errno
+    libc.include.signal
+    libc.src.signal.raise
+    libc.src.signal.sigdelset
+    libc.src.signal.sigfillset
+    libc.src.signal.sigprocmask
+    libc.test.errno_setter_matcher
 )

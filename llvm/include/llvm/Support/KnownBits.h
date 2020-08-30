@@ -240,7 +240,52 @@ public:
   /// Compute known bits resulting from adding LHS and RHS.
   static KnownBits computeForAddSub(bool Add, bool NSW, const KnownBits &LHS,
                                     KnownBits RHS);
+
+  /// Insert the bits from a smaller known bits starting at bitPosition.
+  void insertBits(const KnownBits &SubBits, unsigned BitPosition) {
+    Zero.insertBits(SubBits.Zero, BitPosition);
+    One.insertBits(SubBits.One, BitPosition);
+  }
+
+  /// Update known bits based on ANDing with RHS.
+  KnownBits &operator&=(const KnownBits &RHS);
+
+  /// Update known bits based on ORing with RHS.
+  KnownBits &operator|=(const KnownBits &RHS);
+
+  /// Update known bits based on XORing with RHS.
+  KnownBits &operator^=(const KnownBits &RHS);
 };
+
+inline KnownBits operator&(KnownBits LHS, const KnownBits &RHS) {
+  LHS &= RHS;
+  return LHS;
+}
+
+inline KnownBits operator&(const KnownBits &LHS, KnownBits &&RHS) {
+  RHS &= LHS;
+  return std::move(RHS);
+}
+
+inline KnownBits operator|(KnownBits LHS, const KnownBits &RHS) {
+  LHS |= RHS;
+  return LHS;
+}
+
+inline KnownBits operator|(const KnownBits &LHS, KnownBits &&RHS) {
+  RHS |= LHS;
+  return std::move(RHS);
+}
+
+inline KnownBits operator^(KnownBits LHS, const KnownBits &RHS) {
+  LHS ^= RHS;
+  return LHS;
+}
+
+inline KnownBits operator^(const KnownBits &LHS, KnownBits &&RHS) {
+  RHS ^= LHS;
+  return std::move(RHS);
+}
 
 } // end namespace llvm
 

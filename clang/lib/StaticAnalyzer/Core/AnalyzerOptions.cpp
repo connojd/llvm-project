@@ -40,7 +40,7 @@ void AnalyzerOptions::printFormattedEntry(
   const size_t PadForDesc = InitialPad + EntryWidth;
 
   FOut.PadToColumn(InitialPad) << EntryDescPair.first;
-  // If the buffer's length is greater then PadForDesc, print a newline.
+  // If the buffer's length is greater than PadForDesc, print a newline.
   if (FOut.getColumn() > PadForDesc)
     FOut << '\n';
 
@@ -134,9 +134,9 @@ StringRef AnalyzerOptions::getCheckerStringOption(StringRef CheckerName,
     CheckerName = CheckerName.substr(0, Pos);
   } while (!CheckerName.empty() && SearchInParents);
 
-  assert(false && "Unknown checker option! Did you call getChecker*Option "
-                  "with incorrect parameters? User input must've been "
-                  "verified by CheckerRegistry.");
+  llvm_unreachable("Unknown checker option! Did you call getChecker*Option "
+                   "with incorrect parameters? User input must've been "
+                   "verified by CheckerRegistry.");
 
   return "";
 }

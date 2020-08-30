@@ -48,7 +48,7 @@ Sections:
       - Size: 0x10
       - Size: 0x20
     Link:    .text
-  - Name:    '.stack_sizes [1]'
+  - Name:    '.stack_sizes (1)'
     Type:    SHT_PROGBITS
     Entries:
       - Address: 0x20
@@ -67,9 +67,9 @@ Sections:
         Addend: 16
         Symbol: .text
         Type:   R_X86_64_64
-  - Name:   '.rela.stack_sizes [1]'
+  - Name:   '.rela.stack_sizes (1)'
     Type:   SHT_RELA
-    Info:   '.stack_sizes [1]'
+    Info:   '.stack_sizes (1)'
     Relocations:
       - Offset: 0
         Symbol: separate_text_section_baz
@@ -125,10 +125,9 @@ Symbols:
 
 --- !ELF
 FileHeader:
-  Class:   ELFCLASS64
-  Data:    ELFDATA2LSB
-  Type:    ET_EXEC
-  Machine: EM_X86_64
+  Class: ELFCLASS64
+  Data:  ELFDATA2LSB
+  Type:  ET_EXEC
 Sections:
   - Name:    .text
     Type:    SHT_PROGBITS
@@ -284,10 +283,9 @@ Symbols:
 
 --- !ELF
 FileHeader:
-  Class:   ELFCLASS64
-  Data:    ELFDATA2LSB
-  Type:    ET_EXEC
-  Machine: EM_X86_64
+  Class: ELFCLASS64
+  Data:  ELFDATA2LSB
+  Type:  ET_EXEC
 Sections:
   - Name:    .text
     Type:    SHT_PROGBITS
@@ -315,10 +313,9 @@ Symbols:
 
 --- !ELF
 FileHeader:
-  Class:   ELFCLASS64
-  Data:    ELFDATA2LSB
-  Type:    ET_EXEC
-  Machine: EM_X86_64
+  Class: ELFCLASS64
+  Data:  ELFDATA2LSB
+  Type:  ET_EXEC
 Sections:
   - Name:    .text
     Type:    SHT_PROGBITS
@@ -409,10 +406,9 @@ Symbols:
 
 --- !ELF
 FileHeader:
-  Class:   ELFCLASS64
-  Data:    ELFDATA2LSB
-  Type:    ET_REL
-  Machine: EM_X86_64
+  Class: ELFCLASS64
+  Data:  ELFDATA2LSB
+  Type:  ET_REL
 Sections:
   - Name:    .text
     Type:    SHT_PROGBITS
@@ -631,10 +627,9 @@ Symbols:
 
 --- !ELF
 FileHeader:
-  Class:   ELFCLASS64
-  Data:    ELFDATA2LSB
-  Type:    ET_EXEC
-  Machine: EM_X86_64
+  Class: ELFCLASS64
+  Data:  ELFDATA2LSB
+  Type:  ET_EXEC
 Sections:
   - Name:    .text
     Type:    SHT_PROGBITS
@@ -691,10 +686,9 @@ Sections:
 
 --- !ELF
 FileHeader:
-  Class:   ELFCLASS32
-  Data:    ELFDATA2MSB
-  Type:    ET_REL
-  Machine: EM_X86_64
+  Class: ELFCLASS32
+  Data:  ELFDATA2MSB
+  Type:  ET_REL
 Sections:
   - Name: .rela.stack_sizes
     Type: SHT_RELA

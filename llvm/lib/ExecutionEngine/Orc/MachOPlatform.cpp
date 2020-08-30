@@ -9,6 +9,7 @@
 #include "llvm/ExecutionEngine/Orc/MachOPlatform.h"
 
 #include "llvm/BinaryFormat/MachO.h"
+#include "llvm/ExecutionEngine/Orc/DebugUtils.h"
 #include "llvm/Support/BinaryByteStream.h"
 #include "llvm/Support/Debug.h"
 
@@ -163,7 +164,8 @@ Error MachOPlatform::notifyAdding(JITDylib &JD, const MaterializationUnit &MU) {
   if (!InitSym)
     return Error::success();
 
-  RegisteredInitSymbols[&JD].add(InitSym);
+  RegisteredInitSymbols[&JD].add(InitSym,
+                                 SymbolLookupFlags::WeaklyReferencedSymbol);
   LLVM_DEBUG({
     dbgs() << "MachOPlatform: Registered init symbol " << *InitSym << " for MU "
            << MU.getName() << "\n";
@@ -183,19 +185,19 @@ MachOPlatform::getInitializerSequence(JITDylib &JD) {
            << JD.getName() << "\n";
   });
 
-  std::vector<JITDylib *> DFSLinkOrder;
+  std::vector<std::shared_ptr<JITDylib>> DFSLinkOrder;
 
   while (true) {
 
     DenseMap<JITDylib *, SymbolLookupSet> NewInitSymbols;
 
     ES.runSessionLocked([&]() {
-      DFSLinkOrder = getDFSLinkOrder(JD);
+      DFSLinkOrder = JD.getDFSLinkOrder();
 
-      for (auto *InitJD : DFSLinkOrder) {
-        auto RISItr = RegisteredInitSymbols.find(InitJD);
+      for (auto &InitJD : DFSLinkOrder) {
+        auto RISItr = RegisteredInitSymbols.find(InitJD.get());
         if (RISItr != RegisteredInitSymbols.end()) {
-          NewInitSymbols[InitJD] = std::move(RISItr->second);
+          NewInitSymbols[InitJD.get()] = std::move(RISItr->second);
           RegisteredInitSymbols.erase(RISItr);
         }
       }
@@ -227,14 +229,14 @@ MachOPlatform::getInitializerSequence(JITDylib &JD) {
   InitializerSequence FullInitSeq;
   {
     std::lock_guard<std::mutex> Lock(InitSeqsMutex);
-    for (auto *InitJD : reverse(DFSLinkOrder)) {
+    for (auto &InitJD : reverse(DFSLinkOrder)) {
       LLVM_DEBUG({
         dbgs() << "MachOPlatform: Appending inits for \"" << InitJD->getName()
                << "\" to sequence\n";
       });
-      auto ISItr = InitSeqs.find(InitJD);
+      auto ISItr = InitSeqs.find(InitJD.get());
       if (ISItr != InitSeqs.end()) {
-        FullInitSeq.emplace_back(InitJD, std::move(ISItr->second));
+        FullInitSeq.emplace_back(InitJD.get(), std::move(ISItr->second));
         InitSeqs.erase(ISItr);
       }
     }
@@ -245,37 +247,17 @@ MachOPlatform::getInitializerSequence(JITDylib &JD) {
 
 Expected<MachOPlatform::DeinitializerSequence>
 MachOPlatform::getDeinitializerSequence(JITDylib &JD) {
-  std::vector<JITDylib *> DFSLinkOrder = getDFSLinkOrder(JD);
+  std::vector<std::shared_ptr<JITDylib>> DFSLinkOrder = JD.getDFSLinkOrder();
 
   DeinitializerSequence FullDeinitSeq;
   {
     std::lock_guard<std::mutex> Lock(InitSeqsMutex);
-    for (auto *DeinitJD : DFSLinkOrder) {
-      FullDeinitSeq.emplace_back(DeinitJD, MachOJITDylibDeinitializers());
+    for (auto &DeinitJD : DFSLinkOrder) {
+      FullDeinitSeq.emplace_back(DeinitJD.get(), MachOJITDylibDeinitializers());
     }
   }
 
   return FullDeinitSeq;
-}
-
-std::vector<JITDylib *> MachOPlatform::getDFSLinkOrder(JITDylib &JD) {
-  std::vector<JITDylib *> Result, WorkStack({&JD});
-  DenseSet<JITDylib *> Visited;
-
-  while (!WorkStack.empty()) {
-    auto *NextJD = WorkStack.back();
-    WorkStack.pop_back();
-    if (Visited.count(NextJD))
-      continue;
-    Visited.insert(NextJD);
-    Result.push_back(NextJD);
-    NextJD->withSearchOrderDo([&](const JITDylibSearchOrder &SO) {
-      for (auto &KV : SO)
-        WorkStack.push_back(KV.first);
-    });
-  }
-
-  return Result;
 }
 
 void MachOPlatform::registerInitInfo(

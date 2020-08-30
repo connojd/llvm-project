@@ -34,6 +34,9 @@ const char *ErrorToString(const Error &E) {
   __builtin_trap();
 }
 
+constexpr size_t AllocationMetadata::kStackFrameStorageBytes;
+constexpr size_t AllocationMetadata::kMaxTraceLengthToCollect;
+
 void AllocationMetadata::RecordAllocation(uintptr_t AllocAddr,
                                           size_t AllocSize) {
   Addr = AllocAddr;
@@ -59,6 +62,11 @@ void AllocationMetadata::CallSiteInfo::RecordBacktrace(
   uintptr_t UncompressedBuffer[kMaxTraceLengthToCollect];
   size_t BacktraceLength =
       Backtrace(UncompressedBuffer, kMaxTraceLengthToCollect);
+  // Backtrace() returns the number of available frames, which may be greater
+  // than the number of frames in the buffer. In this case, we need to only pack
+  // the number of frames that are in the buffer.
+  if (BacktraceLength > kMaxTraceLengthToCollect)
+    BacktraceLength = kMaxTraceLengthToCollect;
   TraceSize =
       compression::pack(UncompressedBuffer, BacktraceLength, CompressedTrace,
                         AllocationMetadata::kStackFrameStorageBytes);

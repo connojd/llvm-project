@@ -11,6 +11,7 @@
 
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/Basic/SourceLocation.h"
+#include "clang/Lex/Token.h"
 
 namespace clang {
 namespace tidy {

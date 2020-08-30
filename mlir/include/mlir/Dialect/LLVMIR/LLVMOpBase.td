@@ -15,20 +15,26 @@
 #define LLVMIR_OP_BASE
 
 include "mlir/IR/OpBase.td"
+include "mlir/Interfaces/SideEffectInterfaces.td"
 
 def LLVM_Dialect : Dialect {
   let name = "llvm";
   let cppNamespace = "LLVM";
+
+  /// FIXME: at the moment this is a dependency of the translation to LLVM IR,
+  /// not really one of this dialect per-se.
+  let dependentDialects = ["omp::OpenMPDialect"];
+
   let hasRegionArgAttrVerify = 1;
+  let hasOperationAttrVerify = 1;
   let extraClassDeclaration = [{
-    ~LLVMDialect();
-    llvm::LLVMContext &getLLVMContext();
-    llvm::Module &getLLVMModule();
+    /// Name of the data layout attributes.
+    static StringRef getDataLayoutAttrName() { return "llvm.data_layout"; }
 
-  private:
-    friend LLVMType;
-
-    std::unique_ptr<detail::LLVMDialectImpl> impl;
+    /// Verifies if the given string is a well-formed data layout descriptor.
+    /// Uses `reportError` to report errors.
+    static LogicalResult verifyDataLayoutString(
+        StringRef descr, llvm::function_ref<void (const Twine &)> reportError);
   }];
 }
 
@@ -56,8 +62,7 @@ class LLVMI<int width>
          "$_self.cast<::mlir::LLVM::LLVMType>().isIntegerTy(" # width # ")">]>,
          "LLVM dialect " # width # "-bit integer">,
       BuildableType<
-        "::mlir::LLVM::LLVMType::getIntNTy("
-        "$_builder.getContext()->getRegisteredDialect<LLVM::LLVMDialect>(),"
+        "::mlir::LLVM::LLVMType::getIntNTy($_builder.getContext(),"
          # width # ")">;
 
 def LLVMI1 : LLVMI<1>;
@@ -133,11 +138,9 @@ class ListIntSubst<string pattern, list<int> values> {
 // or result in the operation.
 def LLVM_IntrPatterns {
   string operand =
-    [{opInst.getOperand($0).getType()
-      .cast<LLVM::LLVMType>().getUnderlyingType()}];
+    [{convertType(opInst.getOperand($0).getType().cast<LLVM::LLVMType>())}];
   string result =
-    [{opInst.getResult($0).getType()
-      .cast<LLVM::LLVMType>().getUnderlyingType()}];
+    [{convertType(opInst.getResult($0).getType().cast<LLVM::LLVMType>())}];
 }
 
 
@@ -210,13 +213,35 @@ class LLVM_OneResultIntrOp<string mnem, list<int> overloadedResults = [],
 
 // LLVM vector reduction over a single vector.
 class LLVM_VectorReduction<string mnem>
-    : LLVM_OneResultIntrOp<"experimental.vector.reduce." # mnem, [], [0], []>,
+    : LLVM_OneResultIntrOp<"experimental.vector.reduce." # mnem,
+                           [], [0], [NoSideEffect]>,
       Arguments<(ins LLVM_Type)>;
 
-// LLVM vector reduction over a single vector, with an initial value.
+// LLVM vector reduction over a single vector, with an initial value,
+// and with permission to reassociate the reduction operations.
 class LLVM_VectorReductionV2<string mnem>
-    : LLVM_OneResultIntrOp<"experimental.vector.reduce.v2." # mnem,
-                           [0], [1], []>,
-      Arguments<(ins LLVM_Type, LLVM_Type)>;
+    : LLVM_OpBase<LLVM_Dialect, "intr.experimental.vector.reduce.v2." # mnem,
+                  [NoSideEffect]>,
+      Results<(outs LLVM_Type:$res)>,
+      Arguments<(ins LLVM_Type, LLVM_Type,
+                 DefaultValuedAttr<BoolAttr, "false">:$reassoc)> {
+  let llvmBuilder = [{
+    llvm::Module *module = builder.GetInsertBlock()->getModule();
+    llvm::Function *fn = llvm::Intrinsic::getDeclaration(
+        module,
+        llvm::Intrinsic::experimental_vector_reduce_v2_}] # mnem # [{,
+        { }] # StrJoin<!listconcat(
+            ListIntSubst<LLVM_IntrPatterns.result, [0]>.lst,
+            ListIntSubst<LLVM_IntrPatterns.operand, [1]>.lst)>.result # [{
+        });
+    auto operands = lookupValues(opInst.getOperands());
+    llvm::FastMathFlags origFM = builder.getFastMathFlags();
+    llvm::FastMathFlags tempFM = origFM;
+    tempFM.setAllowReassoc($reassoc);
+    builder.setFastMathFlags(tempFM);  // set fastmath flag
+    $res = builder.CreateCall(fn, operands);
+    builder.setFastMathFlags(origFM);  // restore fastmath flag
+  }];
+}
 
 #endif  // LLVMIR_OP_BASE
