@@ -242,7 +242,7 @@ else()
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Bareflank")
   set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "LLVM Toolchain")
   set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/bareflank/llvm-project")
-  set(CPACK_DEBIAN_PACKAGE_PROVIDES "clang-11, clang-format-11, clang-tidy-11, llvm-11, lld-11")
+  set(CPACK_DEBIAN_PACKAGE_PROVIDES "clang-${LLVM_VERSION_MAJOR}, clang-format-${LLVM_VERSION_MAJOR}, clang-tidy-${LLVM_VERSION_MAJOR}, llvm-${LLVM_VERSION_MAJOR}, lld-${LLVM_VERSION_MAJOR}")
   set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
   set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
   set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
@@ -382,13 +382,13 @@ option(LLVM_ENABLE_Z3_SOLVER
 
 if (LLVM_ENABLE_Z3_SOLVER)
   find_package(Z3 4.7.1)
-  
+
   if (LLVM_Z3_INSTALL_DIR)
     if (NOT Z3_FOUND)
       message(FATAL_ERROR "Z3 >= 4.7.1 has not been found in LLVM_Z3_INSTALL_DIR: ${LLVM_Z3_INSTALL_DIR}.")
     endif()
   endif()
-  
+
   if (NOT Z3_FOUND)
     message(FATAL_ERROR "LLVM_ENABLE_Z3_SOLVER cannot be enabled when Z3 is not available.")
   endif()
