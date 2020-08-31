@@ -24,10 +24,6 @@ AST_MATCHER(CXXConstructorDecl, hasZeroArgs) {
   return Node.getNumParams() == 0;
 }
 
-AST_MATCHER(CXXConstructorDecl, hasAtLeastTwoArgs) {
-  return Node.getMinRequiredArguments() > 1;
-}
-
 AST_MATCHER(CXXConstructorDecl, firstParamIsParamPack) {
   return Node.getNumParams() == 1 && Node.getParamDecl(0)->isParameterPack();
 }
@@ -49,7 +45,6 @@ void ExplicitConstructorCheck::registerMatchers(MatchFinder *Finder) {
                                       isCopyConstructor(),
                                       isMoveConstructor(),
                                       hasZeroArgs(),
-                                      hasAtLeastTwoArgs(),
                                       firstParamIsParamPack()))).bind("ctor"),
       this);
 }
@@ -63,6 +58,9 @@ void ExplicitConstructorCheck::check(const MatchFinder::MatchResult &Result) {
     return;
 
   if (!ArgType->isBuiltinType())
+    return;
+
+  if (Ctor->getMinRequiredArguments() >= 2)
     return;
 
   const auto Loc = Ctor->getLocation();
