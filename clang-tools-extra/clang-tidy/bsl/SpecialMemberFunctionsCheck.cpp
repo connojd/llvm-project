@@ -16,195 +16,129 @@ namespace clang {
 namespace tidy {
 namespace bsl {
 
-SpecialMemberFunctionsCheck::SpecialMemberFunctionsCheck(
-    StringRef Name, ClangTidyContext *Context)
-    : ClangTidyCheck(Name, Context),
-      AllowMissingMoveFunctions(Options.get("AllowMissingMoveFunctions", 0)),
-      AllowSoleDefaultDtor(Options.get("AllowSoleDefaultDtor", 0)),
-      AllowMissingMoveFunctionsWhenCopyIsDeleted(
-          Options.get("AllowMissingMoveFunctionsWhenCopyIsDeleted", 0)) {}
-
-void SpecialMemberFunctionsCheck::storeOptions(
-    ClangTidyOptions::OptionMap &Opts) {
-  Options.store(Opts, "AllowMissingMoveFunctions", AllowMissingMoveFunctions);
-  Options.store(Opts, "AllowSoleDefaultDtor", AllowSoleDefaultDtor);
-  Options.store(Opts, "AllowMissingMoveFunctionsWhenCopyIsDeleted",
-                AllowMissingMoveFunctionsWhenCopyIsDeleted);
-}
-
 void SpecialMemberFunctionsCheck::registerMatchers(MatchFinder *Finder) {
   Finder->addMatcher(
-      cxxRecordDecl(
-          eachOf(
-              has(cxxConstructorDecl(isDefaultConstructor(),
-                                     unless(isImplicit()))
-                      .bind("ctor")),
-              has(cxxDestructorDecl(unless(anyOf(isImplicit(), isVirtual()))).bind("dtor")),
-              has(cxxConstructorDecl(isCopyConstructor(), unless(isImplicit()))
-                      .bind("copy-ctor")),
-              has(cxxMethodDecl(isCopyAssignmentOperator(),
-                                unless(isImplicit()))
-                      .bind("copy-assign")),
-              has(cxxConstructorDecl(isMoveConstructor(), unless(isImplicit()))
-                      .bind("move-ctor")),
-              has(cxxMethodDecl(isMoveAssignmentOperator(),
-                                unless(isImplicit()))
-                      .bind("move-assign"))))
-          .bind("class-def"),
-      this);
+    cxxRecordDecl(
+      hasDefinition(),
+      isClass(),
+      unless(
+        isImplicit()
+      )
+    ).bind("class"),
+    this
+  );
 }
 
-static llvm::StringRef
-toString(SpecialMemberFunctionsCheck::SpecialMemberFunctionKind K) {
-  switch (K) {
-  case SpecialMemberFunctionsCheck::SpecialMemberFunctionKind::
-      DefaultConstructor:
-    return "a default constructor";
-  case SpecialMemberFunctionsCheck::SpecialMemberFunctionKind::Destructor:
-    return "a destructor";
-  case SpecialMemberFunctionsCheck::SpecialMemberFunctionKind::
-      DefaultDestructor:
-    return "a default destructor";
-  case SpecialMemberFunctionsCheck::SpecialMemberFunctionKind::
-      NonDefaultDestructor:
-    return "a non-default destructor";
-  case SpecialMemberFunctionsCheck::SpecialMemberFunctionKind::CopyConstructor:
-    return "a copy constructor";
-  case SpecialMemberFunctionsCheck::SpecialMemberFunctionKind::CopyAssignment:
-    return "a copy assignment operator";
-  case SpecialMemberFunctionsCheck::SpecialMemberFunctionKind::MoveConstructor:
-    return "a move constructor";
-  case SpecialMemberFunctionsCheck::SpecialMemberFunctionKind::MoveAssignment:
-    return "a move assignment operator";
-  }
-  llvm_unreachable("Unhandled SpecialMemberFunctionKind");
-}
+void SpecialMemberFunctionsCheck::check(const MatchFinder::MatchResult &Result) {
+  const auto *D = Result.Nodes.getNodeAs<CXXRecordDecl>("class");
+  const auto Loc = D->getLocation();
 
-static std::string
-join(ArrayRef<SpecialMemberFunctionsCheck::SpecialMemberFunctionKind> SMFS,
-     llvm::StringRef AndOr) {
-
-  assert(!SMFS.empty() &&
-         "List of defined or undefined members should never be empty.");
-  std::string Buffer;
-  llvm::raw_string_ostream Stream(Buffer);
-
-  Stream << toString(SMFS[0]);
-  size_t LastIndex = SMFS.size() - 1;
-  for (size_t i = 1; i < LastIndex; ++i) {
-    Stream << ", " << toString(SMFS[i]);
-  }
-  if (LastIndex != 0) {
-    Stream << AndOr << toString(SMFS[LastIndex]);
-  }
-  return Stream.str();
-}
-
-void SpecialMemberFunctionsCheck::check(
-    const MatchFinder::MatchResult &Result) {
-  const auto *MatchedDecl = Result.Nodes.getNodeAs<CXXRecordDecl>("class-def");
-  if (!MatchedDecl)
+  if (Loc.isInvalid())
     return;
 
-  ClassDefId ID(MatchedDecl->getLocation(),
-                std::string(MatchedDecl->getName()));
+  bool hasDefaultConstructor{false};
+  bool hasCopyConstructor{false};
+  bool hasMoveConstructor{false};
+  bool hasCopyAssignment{false};
+  bool hasMoveAssignment{false};
+  bool hasDestructor{false};
 
-  auto StoreMember = [this, &ID](SpecialMemberFunctionData data) {
-    llvm::SmallVectorImpl<SpecialMemberFunctionData> &Members =
-        ClassWithSpecialMembers[ID];
-    if (!llvm::is_contained(Members, data))
-      Members.push_back(std::move(data));
-  };
+  for (auto const &M : D->methods()) {
+    if (M->isImplicit())
+      continue;
 
-  if (const auto *Dtor = Result.Nodes.getNodeAs<CXXMethodDecl>("dtor")) {
-    StoreMember({Dtor->isDefaulted()
-                     ? SpecialMemberFunctionKind::DefaultDestructor
-                     : SpecialMemberFunctionKind::NonDefaultDestructor,
-                 Dtor->isDeleted()});
-  }
+    if (auto d{dyn_cast<CXXConstructorDecl>(M)}) {
+      if (d->isDefaultConstructor())
+        hasDefaultConstructor = true;
+      if (d->isCopyConstructor())
+        hasCopyConstructor = true;
+      if (d->isMoveConstructor())
+        hasMoveConstructor = true;
 
-  std::initializer_list<std::pair<std::string, SpecialMemberFunctionKind>>
-      Matchers = {{"copy-ctor", SpecialMemberFunctionKind::CopyConstructor},
-                  {"copy-assign", SpecialMemberFunctionKind::CopyAssignment},
-                  {"move-ctor", SpecialMemberFunctionKind::MoveConstructor},
-                  {"move-assign", SpecialMemberFunctionKind::MoveAssignment},
-                  {"ctor", SpecialMemberFunctionKind::DefaultConstructor}};
-
-  for (const auto &KV : Matchers)
-    if (const auto *MethodDecl =
-            Result.Nodes.getNodeAs<CXXMethodDecl>(KV.first)) {
-      StoreMember({KV.second, MethodDecl->isDeleted()});
+      continue;
     }
-}
 
-void SpecialMemberFunctionsCheck::onEndOfTranslationUnit() {
-  for (const auto &C : ClassWithSpecialMembers) {
-    checkForMissingMembers(C.first, C.second);
-  }
-}
+    if (auto d{dyn_cast<CXXDestructorDecl>(M)}) {
+      hasDestructor = true;
+      continue;
+    }
 
-void SpecialMemberFunctionsCheck::checkForMissingMembers(
-    const ClassDefId &ID,
-    llvm::ArrayRef<SpecialMemberFunctionData> DefinedMembers) {
-  llvm::SmallVector<SpecialMemberFunctionKind, 5> MissingMembers;
-
-  auto HasMember = [&](SpecialMemberFunctionKind Kind) {
-    return llvm::any_of(DefinedMembers, [Kind](const auto &data) {
-      return data.FunctionKind == Kind;
-    });
-  };
-
-  auto IsDeleted = [&](SpecialMemberFunctionKind Kind) {
-    return llvm::any_of(DefinedMembers, [Kind](const auto &data) {
-      return data.FunctionKind == Kind && data.IsDeleted;
-    });
-  };
-
-  auto RequireMember = [&](SpecialMemberFunctionKind Kind) {
-    if (!HasMember(Kind))
-      MissingMembers.push_back(Kind);
-  };
-
-  bool RequireThree =
-      HasMember(SpecialMemberFunctionKind::NonDefaultDestructor) ||
-      (!AllowSoleDefaultDtor &&
-       HasMember(SpecialMemberFunctionKind::DefaultDestructor)) ||
-      HasMember(SpecialMemberFunctionKind::CopyConstructor) ||
-      HasMember(SpecialMemberFunctionKind::CopyAssignment) ||
-      HasMember(SpecialMemberFunctionKind::MoveConstructor) ||
-      HasMember(SpecialMemberFunctionKind::MoveAssignment) ||
-      HasMember(SpecialMemberFunctionKind::DefaultConstructor);
-
-  bool RequireFive = (!AllowMissingMoveFunctions && RequireThree &&
-                      getLangOpts().CPlusPlus11) ||
-                     HasMember(SpecialMemberFunctionKind::MoveConstructor) ||
-                     HasMember(SpecialMemberFunctionKind::MoveAssignment);
-
-  if (RequireThree) {
-    if (!HasMember(SpecialMemberFunctionKind::DefaultDestructor) &&
-        !HasMember(SpecialMemberFunctionKind::NonDefaultDestructor))
-      MissingMembers.push_back(SpecialMemberFunctionKind::Destructor);
-
-    RequireMember(SpecialMemberFunctionKind::CopyConstructor);
-    RequireMember(SpecialMemberFunctionKind::CopyAssignment);
+    if (M->isCopyAssignmentOperator())
+      hasCopyAssignment = true;
+    if (M->isMoveAssignmentOperator())
+      hasMoveAssignment = true;
   }
 
-  if (RequireFive &&
-      !(AllowMissingMoveFunctionsWhenCopyIsDeleted &&
-        (IsDeleted(SpecialMemberFunctionKind::CopyConstructor) &&
-         IsDeleted(SpecialMemberFunctionKind::CopyAssignment)))) {
-    assert(RequireThree);
-    RequireMember(SpecialMemberFunctionKind::MoveConstructor);
-    RequireMember(SpecialMemberFunctionKind::MoveAssignment);
+  if (hasDefaultConstructor) {
+    if (!hasCopyConstructor ||
+        !hasMoveConstructor ||
+        !hasCopyAssignment ||
+        !hasMoveAssignment ||
+        !hasDestructor) {
+      diag(Loc, "if a default constructor is declared, a copy/move constructor, "
+                 "a copy/move assignment operator and a destructor must also be "
+                 "provided");
+      return;
+    }
   }
 
-  if (!MissingMembers.empty()) {
-    llvm::SmallVector<SpecialMemberFunctionKind, 5> DefinedMemberKinds;
-    llvm::transform(DefinedMembers, std::back_inserter(DefinedMemberKinds),
-                    [](const auto &data) { return data.FunctionKind; });
-    diag(ID.first, "class '%0' defines %1 but does not define %2")
-        << ID.second << bsl::join(DefinedMemberKinds, " and ")
-        << bsl::join(MissingMembers, " or ");
+  if (hasCopyConstructor) {
+    if (!hasMoveConstructor ||
+        !hasCopyAssignment ||
+        !hasMoveAssignment ||
+        !hasDestructor) {
+      diag(Loc, "if a copy constructor is declared, a move constructor, "
+                 "a copy/move assignment operator and a destructor must also be "
+                 "provided");
+      return;
+    }
+  }
+
+  if (hasMoveConstructor) {
+    if (!hasCopyConstructor ||
+        !hasCopyAssignment ||
+        !hasMoveAssignment ||
+        !hasDestructor) {
+      diag(Loc, "if a move constructor is declared, a copy constructor, "
+                 "a copy/move assignment operator and a destructor must also be "
+                 "provided");
+      return;
+    }
+  }
+
+  if (hasCopyAssignment) {
+    if (!hasCopyConstructor ||
+        !hasMoveConstructor ||
+        !hasMoveAssignment ||
+        !hasDestructor) {
+      diag(Loc, "if a copy assignment operator is declared, a copy/move constructor, "
+                 "a move assignment operator and a destructor must also be "
+                 "provided");
+      return;
+    }
+  }
+
+  if (hasMoveAssignment) {
+    if (!hasCopyConstructor ||
+        !hasMoveConstructor ||
+        !hasCopyAssignment ||
+        !hasDestructor) {
+      diag(Loc, "if a move assignment operator is declared, a copy/move constructor, "
+                 "a copy assignment operator and a destructor must also be "
+                 "provided");
+      return;
+    }
+  }
+
+  if (hasDestructor) {
+    if (!hasCopyConstructor ||
+        !hasMoveConstructor ||
+        !hasCopyAssignment ||
+        !hasMoveAssignment) {
+      diag(Loc, "if a destructor is declared, a copy/move constructor "
+                 "and a copy/move assignment operator must also be provided");
+      return;
+    }
   }
 }
 
