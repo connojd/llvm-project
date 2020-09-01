@@ -39,10 +39,13 @@ void UsingIdentUniqueNamespaceCheck::registerMatchers(MatchFinder *Finder) {
 
 void UsingIdentUniqueNamespaceCheck::check(const MatchFinder::MatchResult &Result) {
   const auto *D = Result.Nodes.getNodeAs<NamedDecl>("decl");
-  const auto Loc = D->getLocation();
 
-  if (isa<VarDecl>(D) ||
-      isa<ParmVarDecl>(D) ||
+  // These are all decl types that we do not need to track. For the template
+  // decls, there is a non-template decl as a child that we are watching and
+  // the template decl itself is actually a duplicate in the AST.
+  if (isa<NamespaceDecl>(D) ||
+      isa<VarDecl>(D) ||
+      isa<FieldDecl>(D) ||
       isa<CXXConstructorDecl>(D) ||
       isa<CXXDestructorDecl>(D) ||
       isa<VarTemplateDecl>(D) ||
@@ -55,56 +58,60 @@ void UsingIdentUniqueNamespaceCheck::check(const MatchFinder::MatchResult &Resul
     return;
   }
 
-  if (Loc.isInvalid())
-    return;
-
-  if (D->getParentFunctionOrMethod() != nullptr)
-    return;
-
-  auto Name{D->getNameAsString()};
-  auto Spec{getNestedNameSpecifierAsString(D)};
-
-  if (Name.empty() || Name[0] == '_')
-    return;
-
-  if (isa<FunctionDecl>(D)) {
-    const auto FD{cast<FunctionDecl>(D)};
+  // Ignore operator overloads
+  if (auto const *FD{dyn_cast<FunctionDecl>(D)}) {
     if (FD->isOverloadedOperator())
       return;
   }
 
-  if (isa<FunctionTemplateDecl>(D)) {
-    const auto FTD{cast<FunctionTemplateDecl>(D)};
+  // Ignore all constructors, including generic (i.e., template) constructors
+  if (auto const *FTD{dyn_cast<FunctionTemplateDecl>(D)}) {
     if (isa<CXXConstructorDecl>(FTD->getTemplatedDecl()))
       return;
   }
 
-  auto iter{m_ids.find(Name)};
+  if (D->getLocation().isInvalid())
+    return;
+
+  // If the decl is "bsl::array", the name is "array" and the specifier is
+  // "bsl::". Sadly, LLVM does not give us a function for the spec, so we
+  // hacked one together using the print function.
+  auto name{D->getNameAsString()};
+  auto spec{getNestedNameSpecifierAsString(D)};
+
+  // Ignore empty/reserved names
+  if (name.empty() || name[0] == '_')
+    return;
+
+  auto iter{m_ids.find(name)};
   if (iter != m_ids.end()) {
     auto &recordList{iter->second};
     for (auto const &record : recordList) {
-      if (Spec == record.spec) {
+
+      // If the specifiers are the same for both, we can ignore this case as
+      // the compiler will make sure the names are overloads. Otherwise, you
+      // would get a compile error. We only care about the case where the
+      // specifiers are different, but a subset of each other. For example,
+      // "bsl::array" and "bsl::details::array".
+      if (spec == record.spec) {
         continue;
       }
 
-      if (Spec.find(record.spec) != std::string::npos) {
-        diag(Loc, "A user-defined type name shall be a unique identifier within a namespace");
-        diag(record.loc, "previous user-defined with the same name found here", DiagnosticIDs::Note);
+      if (spec.find(record.spec) != std::string::npos) {
+        diag(D->getLocation(), "A user-defined type name shall be a unique identifier within a namespace");
+        diag(record.D->getLocation(), "previous user-defined with the same name found here", DiagnosticIDs::Note);
         return;
       }
 
-      if (record.spec.find(Spec) != std::string::npos) {
-        diag(Loc, "A user-defined type name shall be a unique identifier within a namespace");
-        diag(record.loc, "previous user-defined with the same name found here", DiagnosticIDs::Note);
+      if (record.spec.find(spec) != std::string::npos) {
+        diag(D->getLocation(), "A user-defined type name shall be a unique identifier within a namespace");
+        diag(record.D->getLocation(), "previous user-defined with the same name found here", DiagnosticIDs::Note);
         return;
       }
     }
   }
 
-  if (isa<NamespaceDecl>(D))
-    return;
-
-  m_ids[Name].push_back({Spec, Loc});
+  m_ids[name].push_back({spec, D});
 }
 
 } // namespace bsl

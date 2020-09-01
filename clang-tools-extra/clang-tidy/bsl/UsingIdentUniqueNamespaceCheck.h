@@ -28,7 +28,7 @@ private:
   struct record_t
   {
     std::string spec;
-    SourceLocation loc;
+    const NamedDecl *D;
   };
 
   std::unordered_map<std::string, std::list<record_t>> m_ids;
