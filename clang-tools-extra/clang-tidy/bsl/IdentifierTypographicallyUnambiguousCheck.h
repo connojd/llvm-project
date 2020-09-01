@@ -15,16 +15,20 @@ namespace clang {
 namespace tidy {
 namespace bsl {
 
-/// Checks that different identifiers are typographically unambiguous
-///
-/// For the user-facing documentation see:
-/// http://clang.llvm.org/extra/clang-tidy/checks/bsl-identifier-typographically-unambiguous.html
 class IdentifierTypographicallyUnambiguousCheck : public ClangTidyCheck {
 public:
   IdentifierTypographicallyUnambiguousCheck(StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
+
+private:
+  struct record_t
+  {
+    const NamedDecl *D;
+  };
+
+  std::unordered_map<std::string, std::list<record_t>> m_ids;
 };
 
 } // namespace bsl
