@@ -9,6 +9,9 @@
 #include "ForwardReferenceOverloadedCheck.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
+#include "clang/Lex/Lexer.h"
+
+#include <iostream>
 
 using namespace clang::ast_matchers;
 
@@ -27,105 +30,158 @@ AST_MATCHER(FunctionDecl, isCopyOrMove) {
 }
 
 void ForwardReferenceOverloadedCheck::registerMatchers(MatchFinder *Finder) {
-  auto ForwardingReferenceParmMatcher =
-      parmVarDecl(
-          hasType(qualType(rValueReferenceType(),
-                           references(templateTypeParmType(hasDeclaration(
-                               templateTypeParmDecl().bind("type-parm-decl")))),
-                           unless(references(qualType(isConstQualified()))))))
-          .bind("parm-var");
-  Finder->addMatcher(ForwardingReferenceParmMatcher, this);
+ auto ForwardingReferenceParmMatcher =
+  parmVarDecl(
+    hasType(
+      qualType(
+        rValueReferenceType(),
+        references(
+          templateTypeParmType(
+            hasDeclaration(
+              templateTypeParmDecl().bind("type-parm-decl")
+            )
+          )
+        ),
+        unless(
+          references(
+            qualType(
+              isConstQualified()
+            )
+          )
+        )
+      )
+    )
+  ).bind("parm-var");
 
   Finder->addMatcher(
-      functionDecl(unless(anyOf(hasAnyParameter(ForwardingReferenceParmMatcher),
-                                isDeleted(), isCopyOrMove())))
-          .bind("other"),
-      this);
+    ForwardingReferenceParmMatcher,
+    this
+  );
+
+  Finder->addMatcher(
+    functionDecl(
+      unless(
+        anyOf(
+          isDeleted(),
+          isCopyOrMove(),
+          isImplicit()
+        )
+      )
+    ).bind("func-decl"),
+    this
+  );
 }
 
 void ForwardReferenceOverloadedCheck::check(
-    const MatchFinder::MatchResult &Result) {
-  auto Mgr = Result.SourceManager;
+    const MatchFinder::MatchResult &Result)
+{
+  std::string name;
 
-  // Match functions that definitely do not have forwarding references
-  const auto *Function = Result.Nodes.getNodeAs<FunctionDecl>("other");
+  if (auto const *FD = Result.Nodes.getNodeAs<FunctionDecl>("func-decl")) {
+    name = FD->getQualifiedNameAsString();
 
-  bool isForwardRef = true;
-
-  const FunctionDecl *FunctionRef;
-  if (Function) {
-    isForwardRef = false;
-    FunctionRef = Function;
-  } else {
-    const auto *ParmVar = Result.Nodes.getNodeAs<ParmVarDecl>("parm-var");
-    const auto *TypeParmDecl =
-        Result.Nodes.getNodeAs<TemplateTypeParmDecl>("type-parm-decl");
-
-    isForwardRef = true;
-
-    // Get the FunctionDecl and FunctionTemplateDecl containing the function
-    // parameter.
-    const auto *FuncForParam =
-        dyn_cast<FunctionDecl>(ParmVar->getDeclContext());
-    if (!FuncForParam)
+    // Ignore prototypes
+    if (FD->getDefinition() != FD)
       return;
-    const FunctionTemplateDecl *FuncTemplate =
-        FuncForParam->getDescribedFunctionTemplate();
-    if (!FuncTemplate)
-      isForwardRef = false;
 
-    // Check that the template type parameter belongs to the same function
-    // template as the function parameter of that type. (This implies that type
-    // deduction will happen on the type.)
-    const TemplateParameterList *Params = FuncTemplate->getTemplateParameters();
-    if (!llvm::is_contained(*Params, TypeParmDecl))
-      isForwardRef = false;
+    // Ignore Specializations
+    if (FD->getMemberSpecializationInfo())
+      return;
 
-    FunctionRef = FuncForParam;
+    // Ignore Specializations
+    if (FD->getTemplateSpecializationInfo())
+      return;
+
+    m_fds[name].push_back(FD);
+  }
+  else {
+    auto const *PVD = Result.Nodes.getNodeAs<ParmVarDecl>("parm-var");
+    auto const *TTPD = Result.Nodes.getNodeAs<TemplateTypeParmDecl>("type-parm-decl");
+
+    // If this is actually a forward reference, add it to the list of
+    // parameters that are for references.
+
+    auto const *parentDC = PVD->getParentFunctionOrMethod();
+    if (parentDC == nullptr)
+      return;
+
+    auto const *parentFD = dyn_cast<FunctionDecl>(parentDC);
+    if (parentFD == nullptr)
+      return;
+
+    name = parentFD->getQualifiedNameAsString();
+
+    auto const *parentFTD = parentFD->getDescribedFunctionTemplate();
+    if (parentFTD == nullptr)
+      return;
+
+    auto const *templateParameters = parentFTD->getTemplateParameters();
+    if (templateParameters == nullptr)
+      return;
+
+    if (!llvm::is_contained(*templateParameters, TTPD))
+      return;
+
+    m_fr_params.insert(PVD);
   }
 
-  std::string funcname = FunctionRef->getQualifiedNameAsString();
+  auto const &fdOverloads{m_fds[name]};
 
-  auto itr = overloadedFunctions.find(funcname);
-  if (itr != overloadedFunctions.end()) {
-    std::vector<const FunctionDecl *> collision_vec = itr->second;
-    for (auto collision : collision_vec) {
-      if (collision->getNumParams() == FunctionRef->getNumParams()) {
-        unsigned int locnum =
-            Mgr->getPresumedLoc(collision->getLocation()).getLine();
-        diag(FunctionRef->getLocation(),
-             "function %0 overloads function declaration with forwarding "
-             "reference on line %1")
-            << funcname << locnum;
-        break;
-      }
-    }
-    // Nit: only add if no collision, but this will get cleaned up anyway
-    overloadedFunctions[funcname].push_back(FunctionRef);
-  } else if (isForwardRef) {
-    overloadedFunctions[funcname] = {FunctionRef};
+  if (fdOverloads.size() <= 1)
+    return;
 
-    // Check nonForwardRefFunctions for existing violations
-    auto nonforward_itr = nonForwardRefFunctions.find(funcname);
-    if (nonforward_itr != nonForwardRefFunctions.end()) {
-      std::vector<const FunctionDecl *> collision_vec = nonforward_itr->second;
-      for (auto collision : collision_vec) {
-        if (collision->getNumParams() == FunctionRef->getNumParams()) {
-          unsigned int locnum =
-              Mgr->getPresumedLoc(FunctionRef->getLocation()).getLine();
-          diag(collision->getLocation(),
-               "function %0 overloads function declaration with forwarding "
-               "reference on line %1")
-              << collision->getQualifiedNameAsString() << locnum;
+  for (auto const *fd1 : fdOverloads) {
+    for (auto const *fd2 : fdOverloads) {
+      if (fd1 == fd2)
+        continue;
+
+      auto const parametersList1{fd1->parameters()};
+      auto const parametersList2{fd2->parameters()};
+
+      if (parametersList1.size() != parametersList2.size())
+        continue;
+
+      ParmVarDecl const *foundParam1{};
+      ParmVarDecl const *foundParam1Previous{};
+      ParmVarDecl const *foundParam2{};
+      ParmVarDecl const *foundParam2Previous{};
+
+      for (size_t i{}; i < parametersList1.size(); ++i) {
+        auto const *param1{parametersList1[i]};
+        auto const *param2{parametersList2[i]};
+
+        if (param1->getType().getTypePtr() != param2->getType().getTypePtr()) {
+          auto iter1 = m_fr_params.find(param1);
+          auto iter2 = m_fr_params.find(param2);
+
+          if (iter1 != m_fr_params.end()) {
+            foundParam1 = param1;
+            foundParam1Previous = param2;
+            continue;
+          }
+
+          if (iter2 != m_fr_params.end()) {
+            foundParam2 = param2;
+            foundParam2Previous = param1;
+            continue;
+          }
+
+          foundParam1 = nullptr;
+          foundParam2 = nullptr;
         }
       }
-    }
-  } else { // Not a forwarding reference; add to nonForwardRef list
-    auto nonforward_itr = nonForwardRefFunctions.find(funcname);
-    if (nonforward_itr != nonForwardRefFunctions.end()) {
-      nonforward_itr->second.push_back(FunctionRef);
-    } else {
-      nonForwardRefFunctions[funcname] = {FunctionRef};
+
+      if (foundParam1 != nullptr) {
+        diag(foundParam1->getLocation(), "A function that contains an ambiguous forwarding "
+                                         "reference as an argument shall not be overloaded.");
+        diag(foundParam1Previous->getLocation(), "previous argument found here", DiagnosticIDs::Note);
+      }
+
+      if (foundParam2 != nullptr) {
+        diag(foundParam2->getLocation(), "A function that contains an ambiguous forwarding "
+                                         "reference as an argument shall not be overloaded.");
+        diag(foundParam2Previous->getLocation(), "previous argument found here", DiagnosticIDs::Note);
+      }
     }
   }
 }
