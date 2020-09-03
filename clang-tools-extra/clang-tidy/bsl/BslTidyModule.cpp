@@ -39,6 +39,7 @@
 #include "LiteralsNoOctalCheck.h"
 #include "LiteralsUnsignedSuffixCheck.h"
 #include "LiteralsUserDefinedCheck.h"
+#include "NamePrefixesCheck.h"
 #include "NamespaceGlobalCheck.h"
 #include "NodiscardCheck.h"
 #include "NonPodClassdefCheck.h"
@@ -127,6 +128,8 @@ public:
         "bsl-literals-digit-separator");
     CheckFactories.registerCheck<LiteralsUserDefinedCheck>(
         "bsl-literals-user-defined");
+    CheckFactories.registerCheck<NamePrefixesCheck>(
+        "bsl-name-prefixes");
     CheckFactories.registerCheck<NamespaceGlobalCheck>(
         "bsl-namespace-global");
     CheckFactories.registerCheck<NodiscardCheck>(

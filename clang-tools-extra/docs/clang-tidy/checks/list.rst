@@ -74,6 +74,7 @@ Clang-Tidy Checks
    `bsl-literals-digit-separator <bsl-literals-digit-separator.html>`_,
    `bsl-literals-no-octal <bsl-literals-no-octal.html>`_,
    `bsl-literals-user-defined <bsl-literals-user-defined.html>`_,
+   `bsl-name-prefixes <bsl-name-prefixes.html>`_, "Yes"
    `bsl-namespace-global <bsl-namespace-global.html>`_,
    `bsl-nodiscard <bsl-nodiscard.html>`_,
    `bsl-non-pod-classdef <bsl-non-pod-classdef.html>`_,

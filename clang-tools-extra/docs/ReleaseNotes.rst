@@ -208,6 +208,11 @@ New checks
 
   Warns on usage of user-defined literals.
 
+- New :doc:`bsl-name-prefixes
+  <clang-tidy/checks/bsl-name-prefixes>` check.
+
+  Warns if a variable does not have the correct prefix in it's name
+
 - New :doc:`bsl-namespace-global
   <clang-tidy/checks/bsl-namespace-global>` check.
 
@@ -261,7 +266,7 @@ New checks
 - New :doc:`bsl-op-relational-return-bool
   <clang-tidy/checks/bsl-op-relational-return-bool>` check.
 
-  FIXME: add release notes.
+  Warns if a comparison operator does not return a bool
 
 - New :doc:`bsl-pure-override
   <clang-tidy/checks/bsl-pure-override>` check.
@@ -325,7 +330,7 @@ New checks
 - New :doc:`bsl-using-ident-unique-namespace
   <clang-tidy/checks/bsl-using-ident-unique-namespace>` check.
 
-  FIXME: add release notes.
+  Warns if a user defined type does not have a unique namespace
 
 - New :doc:`bsl-var-braced-init
   <clang-tidy/checks/bsl-var-braced-init>` check.
