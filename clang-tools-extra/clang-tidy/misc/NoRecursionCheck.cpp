@@ -202,6 +202,16 @@ void NoRecursionCheck::registerMatchers(MatchFinder *Finder) {
 void NoRecursionCheck::handleSCC(ArrayRef<CallGraphNode *> SCC) {
   assert(!SCC.empty() && "Empty SCC does not make sense.");
 
+  bool SCCIsConstEval = true;
+
+  for (CallGraphNode *N : SCC) {
+    FunctionDecl *D = N->getDefinition();
+    SCCIsConstEval = D->isConsteval() && SCCIsConstEval;
+  }
+
+  if (SCCIsConstEval)
+    return;
+
   // First of all, call out every strongly connected function.
   for (CallGraphNode *N : SCC) {
     FunctionDecl *D = N->getDefinition();
