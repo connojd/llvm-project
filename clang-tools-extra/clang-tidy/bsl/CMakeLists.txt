@@ -17,6 +17,7 @@ add_clang_library(clangTidyBslModule
   DeclForbiddenCheck.cpp
   DestructorAccessSpecifierCheck.cpp
   ElseRequiredAfterIfCheck.cpp
+  EmptyIfElseCheck.cpp
   EnumExplicitCheck.cpp
   EnumInitCheck.cpp
   EnumScopedCheck.cpp

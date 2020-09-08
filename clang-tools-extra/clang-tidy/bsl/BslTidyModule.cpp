@@ -23,6 +23,7 @@
 #include "DeclForbiddenCheck.h"
 #include "DestructorAccessSpecifierCheck.h"
 #include "ElseRequiredAfterIfCheck.h"
+#include "EmptyIfElseCheck.h"
 #include "EnumExplicitCheck.h"
 #include "EnumInitCheck.h"
 #include "EnumScopedCheck.h"
@@ -103,6 +104,8 @@ public:
         "bsl-destructor-access-specifier");
     CheckFactories.registerCheck<ElseRequiredAfterIfCheck>(
         "bsl-else-required-after-if");
+    CheckFactories.registerCheck<EmptyIfElseCheck>(
+        "bsl-empty-if-else");
     CheckFactories.registerCheck<EnumExplicitCheck>(
         "bsl-enum-explicit");
     CheckFactories.registerCheck<EnumInitCheck>(

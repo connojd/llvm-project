@@ -160,6 +160,11 @@ New checks
   warn if else is used when it shouldn't be, which would prevent the above
   checks from working correctly.
 
+- New :doc:`bsl-empty-if-else
+  <clang-tidy/checks/bsl-empty-if-else>` check.
+
+  Warns if an if, else-if or else statement is empty.
+
 - New :doc:`bsl-explicit-constructor
   <clang-tidy/checks/bsl-explicit-constructor>` check.
 

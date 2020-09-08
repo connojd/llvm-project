@@ -59,6 +59,7 @@ Clang-Tidy Checks
    `bsl-decl-forbidden <bsl-decl-forbidden.html>`_,
    `bsl-destructor-access-specifier <bsl-destructor-access-specifier.html>`_,
    `bsl-else-required-after-if <bsl-else-required-after-if.html>`_,
+   `bsl-empty-if-else <bsl-empty-if-else.html>`_, "Yes"
    `bsl-enum-explicit <bsl-enum-explicit.html>`_,
    `bsl-enum-init <bsl-enum-init.html>`_,
    `bsl-enum-scoped <bsl-enum-scoped.html>`_,
@@ -74,7 +75,7 @@ Clang-Tidy Checks
    `bsl-literals-digit-separator <bsl-literals-digit-separator.html>`_,
    `bsl-literals-no-octal <bsl-literals-no-octal.html>`_,
    `bsl-literals-user-defined <bsl-literals-user-defined.html>`_,
-   `bsl-name-case <bsl-name-case.html>`_, "Yes"
+   `bsl-name-case <bsl-name-case.html>`_,
    `bsl-name-prefixes <bsl-name-prefixes.html>`_,
    `bsl-namespace-global <bsl-namespace-global.html>`_,
    `bsl-nodiscard <bsl-nodiscard.html>`_,
