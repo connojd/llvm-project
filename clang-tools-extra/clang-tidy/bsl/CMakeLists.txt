@@ -33,6 +33,7 @@ add_clang_library(clangTidyBslModule
   LiteralsNoOctalCheck.cpp
   LiteralsUnsignedSuffixCheck.cpp
   LiteralsUserDefinedCheck.cpp
+  NameCaseCheck.cpp
   NamePrefixesCheck.cpp
   NamespaceGlobalCheck.cpp
   NodiscardCheck.cpp

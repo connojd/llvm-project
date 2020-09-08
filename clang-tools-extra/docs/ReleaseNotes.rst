@@ -208,6 +208,11 @@ New checks
 
   Warns on usage of user-defined literals.
 
+- New :doc:`bsl-name-case
+  <clang-tidy/checks/bsl-name-case>` check.
+
+  FIXME: add release notes.
+
 - New :doc:`bsl-name-prefixes
   <clang-tidy/checks/bsl-name-prefixes>` check.
 
