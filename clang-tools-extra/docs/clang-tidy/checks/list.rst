@@ -59,7 +59,7 @@ Clang-Tidy Checks
    `bsl-decl-forbidden <bsl-decl-forbidden.html>`_,
    `bsl-destructor-access-specifier <bsl-destructor-access-specifier.html>`_,
    `bsl-else-required-after-if <bsl-else-required-after-if.html>`_,
-   `bsl-empty-if-else <bsl-empty-if-else.html>`_, "Yes"
+   `bsl-empty-if-else <bsl-empty-if-else.html>`_,
    `bsl-enum-explicit <bsl-enum-explicit.html>`_,
    `bsl-enum-init <bsl-enum-init.html>`_,
    `bsl-enum-scoped <bsl-enum-scoped.html>`_,
@@ -69,6 +69,7 @@ Clang-Tidy Checks
    `bsl-function-name-use <bsl-function-name-use.html>`_, "Yes"
    `bsl-function-noexcept <bsl-function-noexcept.html>`_,
    `bsl-identifier-typographically-unambiguous <bsl-identifier-typographically-unambiguous.html>`_,
+   `bsl-implicit-conversions-forbidden <bsl-implicit-conversions-forbidden.html>`_, "Yes"
    `bsl-lambda-implicit-capture <bsl-lambda-implicit-capture.html>`_,
    `bsl-lambda-param-list <bsl-lambda-param-list.html>`_,
    `bsl-literals-ascii-only <bsl-literals-ascii-only.html>`_,

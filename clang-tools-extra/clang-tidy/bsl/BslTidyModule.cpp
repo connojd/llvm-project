@@ -33,6 +33,7 @@
 #include "FunctionNameUseCheck.h"
 #include "FunctionNoexceptCheck.h"
 #include "IdentifierTypographicallyUnambiguousCheck.h"
+#include "ImplicitConversionsForbiddenCheck.h"
 #include "LambdaImplicitCaptureCheck.h"
 #include "LambdaParamListCheck.h"
 #include "LiteralsAsciiOnlyCheck.h"
@@ -124,6 +125,8 @@ public:
         "bsl-function-noexcept");
     CheckFactories.registerCheck<IdentifierTypographicallyUnambiguousCheck>(
         "bsl-identifier-typographically-unambiguous");    
+    CheckFactories.registerCheck<ImplicitConversionsForbiddenCheck>(
+        "bsl-implicit-conversions-forbidden");
     CheckFactories.registerCheck<LambdaImplicitCaptureCheck>(
         "bsl-lambda-implicit-capture");
     CheckFactories.registerCheck<LambdaParamListCheck>(

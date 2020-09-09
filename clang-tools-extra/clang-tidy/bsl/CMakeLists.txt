@@ -27,6 +27,7 @@ add_clang_library(clangTidyBslModule
   FunctionNameUseCheck.cpp
   FunctionNoexceptCheck.cpp
   IdentifierTypographicallyUnambiguousCheck.cpp
+  ImplicitConversionsForbiddenCheck.cpp
   LambdaImplicitCaptureCheck.cpp
   LambdaParamListCheck.cpp
   LiteralsAsciiOnlyCheck.cpp
