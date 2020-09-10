@@ -82,7 +82,7 @@ Clang-Tidy Checks
    `bsl-nodiscard <bsl-nodiscard.html>`_,
    `bsl-non-pod-classdef <bsl-non-pod-classdef.html>`_,
    `bsl-non-pod-static <bsl-non-pod-static.html>`_,
-   `bsl-non-safe-integral-types-are-forbidden <bsl-non-safe-integral-types-are-forbidden.html>`_, "Yes"
+   `bsl-non-safe-integral-types-are-forbidden <bsl-non-safe-integral-types-are-forbidden.html>`_,
    `bsl-op-bitwise-operands <bsl-op-bitwise-operands.html>`_, "Yes"
    `bsl-op-conditional-subexpr <bsl-op-conditional-subexpr.html>`_,
    `bsl-op-equality-virt-memfn-nullptr <bsl-op-equality-virt-memfn-nullptr.html>`_,
@@ -102,6 +102,7 @@ Clang-Tidy Checks
    `bsl-types-fixed-width-ints <bsl-types-fixed-width-ints.html>`_,
    `bsl-types-no-wide-char <bsl-types-no-wide-char.html>`_,
    `bsl-unused-return-value <bsl-unused-return-value.html>`_,
+   `bsl-user-defined-type-names-match-header-name <bsl-user-defined-type-names-match-header-name.html>`_, "Yes"
    `bsl-using-decl-scope <bsl-using-decl-scope.html>`_,
    `bsl-using-ident-unique-namespace <bsl-using-ident-unique-namespace.html>`_,
    `bsl-var-braced-init <bsl-var-braced-init.html>`_,

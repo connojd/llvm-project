@@ -341,6 +341,12 @@ New checks
 
   Warns if you use the ternary operator
 
+- New :doc:`bsl-user-defined-type-names-match-header-name
+  <clang-tidy/checks/bsl-user-defined-type-names-match-header-name>` check.
+
+  Warns if a user defined type does not have the same name as the header
+  it is defined in.
+
 - New :doc:`bsl-using-decl-scope
   <clang-tidy/checks/bsl-using-decl-scope>` check.
 

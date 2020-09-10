@@ -61,6 +61,7 @@ add_clang_library(clangTidyBslModule
   TypesFixedWidthIntsCheck.cpp
   TypesNoWideCharCheck.cpp
   UnusedReturnValueCheck.cpp
+  UserDefinedTypeNamesMatchHeaderNameCheck.cpp
   UsingDeclScopeCheck.cpp
   UsingIdentUniqueNamespaceCheck.cpp
   VarBracedInitCheck.cpp

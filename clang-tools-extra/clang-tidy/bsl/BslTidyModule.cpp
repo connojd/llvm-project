@@ -67,6 +67,7 @@
 #include "TypesFixedWidthIntsCheck.h"
 #include "TypesNoWideCharCheck.h"
 #include "UnusedReturnValueCheck.h"
+#include "UserDefinedTypeNamesMatchHeaderNameCheck.h"
 #include "UsingDeclScopeCheck.h"
 #include "UsingIdentUniqueNamespaceCheck.h"
 #include "VarBracedInitCheck.h"
@@ -194,6 +195,8 @@ public:
         "bsl-types-no-wide-char");
     CheckFactories.registerCheck<UnusedReturnValueCheck>(
         "bsl-unused-return-value");
+    CheckFactories.registerCheck<UserDefinedTypeNamesMatchHeaderNameCheck>(
+        "bsl-user-defined-type-names-match-header-name");
     CheckFactories.registerCheck<UsingDeclScopeCheck>(
         "bsl-using-decl-scope");
     CheckFactories.registerCheck<UsingIdentUniqueNamespaceCheck>(
