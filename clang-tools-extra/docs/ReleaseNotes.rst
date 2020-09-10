@@ -358,6 +358,11 @@ New checks
 
   Warns if a user defined type does not have a unique namespace
 
+- New :doc:`bsl-using-namespace-forbidden
+  <clang-tidy/checks/bsl-using-namespace-forbidden>` check.
+
+  Warns if you include a "using namespace blah" in your code.
+
 - New :doc:`bsl-var-braced-init
   <clang-tidy/checks/bsl-var-braced-init>` check.
 

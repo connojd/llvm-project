@@ -64,6 +64,7 @@ add_clang_library(clangTidyBslModule
   UserDefinedTypeNamesMatchHeaderNameCheck.cpp
   UsingDeclScopeCheck.cpp
   UsingIdentUniqueNamespaceCheck.cpp
+  UsingNamespaceForbiddenCheck.cpp
   VarBracedInitCheck.cpp
 
   LINK_LIBS
