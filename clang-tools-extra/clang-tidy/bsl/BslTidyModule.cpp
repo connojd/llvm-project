@@ -47,6 +47,7 @@
 #include "NodiscardCheck.h"
 #include "NonPodClassdefCheck.h"
 #include "NonPodStaticCheck.h"
+#include "NonSafeIntegralTypesAreForbiddenCheck.h"
 #include "OpBitwiseOperandsCheck.h"
 #include "OpConditionalSubexprCheck.h"
 #include "OpEqualityVirtMemfnNullptrCheck.h"
@@ -147,6 +148,8 @@ public:
         "bsl-non-pod-classdef");
     CheckFactories.registerCheck<NonPodStaticCheck>(
         "bsl-non-pod-static");
+    CheckFactories.registerCheck<NonSafeIntegralTypesAreForbiddenCheck>(
+        "bsl-non-safe-integral-types-are-forbidden");
     CheckFactories.registerCheck<OpBitwiseOperandsCheck>(
         "bsl-op-bitwise-operands");
     CheckFactories.registerCheck<OpConditionalSubexprCheck>(

@@ -221,7 +221,7 @@ New checks
 - New :doc:`bsl-name-case
   <clang-tidy/checks/bsl-name-case>` check.
 
-  FIXME: add release notes.
+  Warns when a named declaration is in the wrong case
 
 - New :doc:`bsl-name-prefixes
   <clang-tidy/checks/bsl-name-prefixes>` check.
@@ -244,6 +244,11 @@ New checks
 
   Warns when member data in non-POD class type is not private and on non-POD types
   not defined as class
+
+- New :doc:`bsl-non-safe-integral-types-are-forbidden
+  <clang-tidy/checks/bsl-non-safe-integral-types-are-forbidden>` check.
+
+  Warns if you try to use an integral type instead of a safe_integral
 
 - New :doc:`bsl-op-bitwise-operands
   <clang-tidy/checks/bsl-op-bitwise-operands>` check.

@@ -41,6 +41,7 @@ add_clang_library(clangTidyBslModule
   NodiscardCheck.cpp
   NonPodClassdefCheck.cpp
   NonPodStaticCheck.cpp
+  NonSafeIntegralTypesAreForbiddenCheck.cpp
   OpBitwiseOperandsCheck.cpp
   OpConditionalSubexprCheck.cpp
   OpEqualityVirtMemfnNullptrCheck.cpp

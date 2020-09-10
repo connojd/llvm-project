@@ -69,7 +69,7 @@ Clang-Tidy Checks
    `bsl-function-name-use <bsl-function-name-use.html>`_, "Yes"
    `bsl-function-noexcept <bsl-function-noexcept.html>`_,
    `bsl-identifier-typographically-unambiguous <bsl-identifier-typographically-unambiguous.html>`_,
-   `bsl-implicit-conversions-forbidden <bsl-implicit-conversions-forbidden.html>`_, "Yes"
+   `bsl-implicit-conversions-forbidden <bsl-implicit-conversions-forbidden.html>`_,
    `bsl-lambda-implicit-capture <bsl-lambda-implicit-capture.html>`_,
    `bsl-lambda-param-list <bsl-lambda-param-list.html>`_,
    `bsl-literals-ascii-only <bsl-literals-ascii-only.html>`_,
@@ -82,6 +82,7 @@ Clang-Tidy Checks
    `bsl-nodiscard <bsl-nodiscard.html>`_,
    `bsl-non-pod-classdef <bsl-non-pod-classdef.html>`_,
    `bsl-non-pod-static <bsl-non-pod-static.html>`_,
+   `bsl-non-safe-integral-types-are-forbidden <bsl-non-safe-integral-types-are-forbidden.html>`_, "Yes"
    `bsl-op-bitwise-operands <bsl-op-bitwise-operands.html>`_, "Yes"
    `bsl-op-conditional-subexpr <bsl-op-conditional-subexpr.html>`_,
    `bsl-op-equality-virt-memfn-nullptr <bsl-op-equality-virt-memfn-nullptr.html>`_,
