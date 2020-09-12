@@ -18,7 +18,7 @@ class A {};
 
 void f1() noexcept {
   auto x1 = 5;
-  // CHECK-MESSAGES: :[[@LINE-1]]:8: warning: auto cannot be used to declare variable of fundamental type [bsl-auto-type-usage] 
+  // CHECK-MESSAGES: :[[@LINE-1]]:8: warning: auto cannot be used to declare variable of fundamental type [bsl-auto-type-usage]
   auto x2 = 0.3F;
   // CHECK-MESSAGES: :[[@LINE-1]]:8: warning: auto cannot be used to declare variable of fundamental type [bsl-auto-type-usage]
   auto x3 = {8};
@@ -30,6 +30,17 @@ void f1() noexcept {
   auto lambda1 = []() -> int {
     return 5U;
   }; // Compliant with case (2) - lambda1 is of non-fundamental lambda expression type
+  auto lambda2 = []() {
+  }; // Compliant with case (2) - lambda1 is of non-fundamental lambda expression type
+  auto lambda3 = []() -> auto {
+  }; // Compliant with case (2) - lambda1 is of non-fundamental lambda expression type
+  auto lambda4 = []() {
+  // CHECK-MESSAGES: :[[@LINE-1]]:18: warning: auto can only be used for declaring function templates with a trailing return [bsl-auto-type-usage]
+    return std::vector<int>{};
+  };
+  auto lambda5 = []() -> std::vector<int> {
+    return std::vector<int>{};
+  };
   auto x5 = lambda1(); // Compliant with case (1)
   auto x7 = std::initializer_list<int>{3}; // non-compliant
   // CHECK-MESSAGES: :[[@LINE-1]]:8: warning: auto cannot be used for list initializers [bsl-auto-type-usage]

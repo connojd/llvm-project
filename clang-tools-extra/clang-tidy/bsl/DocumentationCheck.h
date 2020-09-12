@@ -1,4 +1,4 @@
-//===--- SpecialMemberFunctionsCheck.h - clang-tidy ----------*- C++ -*-===//
+//===--- DocumentationCheck.h - clang-tidy ----------------------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_BSL_SPECIALMEMBERFUNCTIONSCHECK_H
-#define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_BSL_SPECIALMEMBERFUNCTIONSCHECK_H
+#ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_BSL_DOCUMENTATIONCHECK_H
+#define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_BSL_DOCUMENTATIONCHECK_H
 
 #include "../ClangTidyCheck.h"
 
@@ -15,9 +15,9 @@ namespace clang {
 namespace tidy {
 namespace bsl {
 
-class SpecialMemberFunctionsCheck : public ClangTidyCheck {
+class DocumentationCheck : public ClangTidyCheck {
 public:
-  SpecialMemberFunctionsCheck(StringRef Name, ClangTidyContext *Context)
+  DocumentationCheck(StringRef Name, ClangTidyContext *Context)
       : ClangTidyCheck(Name, Context) {}
   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
@@ -27,4 +27,4 @@ public:
 } // namespace tidy
 } // namespace clang
 
-#endif // LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_BSL_SPECIALMEMBERFUNCTIONSCHECK_H
+#endif // LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_BSL_DOCUMENTATIONCHECK_H

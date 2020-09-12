@@ -10,19 +10,13 @@
 #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_BSL_FORWARDREFERENCEOVERLOADEDCHECK_H
 
 #include "../ClangTidyCheck.h"
+#include <set>
 #include <unordered_map>
-#include <vector>
 
 namespace clang {
 namespace tidy {
 namespace bsl {
 
-/// Checks that a function that containing a “forwarding reference” as its
-/// argument is not overloaded unless the overload has a different number of
-/// parameters
-///
-/// For the user-facing documentation see:
-/// http://clang.llvm.org/extra/clang-tidy/checks/bsl-forward-reference-overloaded.html
 class ForwardReferenceOverloadedCheck : public ClangTidyCheck {
 public:
   ForwardReferenceOverloadedCheck(StringRef Name, ClangTidyContext *Context)
@@ -34,10 +28,8 @@ public:
   }
 
 private:
-  std::unordered_map<std::string, std::vector<const FunctionDecl *>>
-      overloadedFunctions;
-  std::unordered_map<std::string, std::vector<const FunctionDecl *>>
-      nonForwardRefFunctions;
+  std::set<ParmVarDecl const *> m_fr_params;
+  std::unordered_map<std::string, std::list<FunctionDecl const *>> m_fds;
 };
 
 } // namespace bsl

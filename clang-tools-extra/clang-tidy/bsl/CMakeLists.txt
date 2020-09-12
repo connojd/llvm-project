@@ -16,7 +16,9 @@ add_clang_library(clangTidyBslModule
   ConstObjStdMoveCheck.cpp
   DeclForbiddenCheck.cpp
   DestructorAccessSpecifierCheck.cpp
+  DocumentationCheck.cpp
   ElseRequiredAfterIfCheck.cpp
+  EmptyIfElseCheck.cpp
   EnumExplicitCheck.cpp
   EnumInitCheck.cpp
   EnumScopedCheck.cpp
@@ -26,6 +28,7 @@ add_clang_library(clangTidyBslModule
   FunctionNameUseCheck.cpp
   FunctionNoexceptCheck.cpp
   IdentifierTypographicallyUnambiguousCheck.cpp
+  ImplicitConversionsForbiddenCheck.cpp
   LambdaImplicitCaptureCheck.cpp
   LambdaParamListCheck.cpp
   LiteralsAsciiOnlyCheck.cpp
@@ -33,10 +36,13 @@ add_clang_library(clangTidyBslModule
   LiteralsNoOctalCheck.cpp
   LiteralsUnsignedSuffixCheck.cpp
   LiteralsUserDefinedCheck.cpp
+  NameCaseCheck.cpp
+  NamePrefixesCheck.cpp
   NamespaceGlobalCheck.cpp
   NodiscardCheck.cpp
   NonPodClassdefCheck.cpp
   NonPodStaticCheck.cpp
+  NonSafeIntegralTypesAreForbiddenCheck.cpp
   OpBitwiseOperandsCheck.cpp
   OpConditionalSubexprCheck.cpp
   OpEqualityVirtMemfnNullptrCheck.cpp
@@ -56,8 +62,10 @@ add_clang_library(clangTidyBslModule
   TypesFixedWidthIntsCheck.cpp
   TypesNoWideCharCheck.cpp
   UnusedReturnValueCheck.cpp
+  UserDefinedTypeNamesMatchHeaderNameCheck.cpp
   UsingDeclScopeCheck.cpp
   UsingIdentUniqueNamespaceCheck.cpp
+  UsingNamespaceForbiddenCheck.cpp
   VarBracedInitCheck.cpp
 
   LINK_LIBS

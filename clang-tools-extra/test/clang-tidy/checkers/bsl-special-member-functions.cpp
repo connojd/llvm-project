@@ -1,143 +1,156 @@
 // RUN: %check_clang_tidy %s bsl-special-member-functions %t
 
-class DefinesConstructor {
-  DefinesConstructor();
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesConstructor' defines a default constructor but does not define a destructor, a copy constructor, a copy assignment operator, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DefinesDefaultedConstructor {
-  DefinesDefaultedConstructor() = default;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesDefaultedConstructor' defines a default constructor but does not define a destructor, a copy constructor, a copy assignment operator, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DefinesDestructor {
-  ~DefinesDestructor();
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesDestructor' defines a non-default destructor but does not define a copy constructor, a copy assignment operator, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DefinesDefaultedDestructor {
-  ~DefinesDefaultedDestructor() = default;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesDefaultedDestructor' defines a default destructor but does not define a copy constructor, a copy assignment operator, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DefinesVirtualDestructor {
-  virtual ~DefinesVirtualDestructor() = 0;
+class DefaultConstructor {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a default constructor is declared, a copy/move constructor, a copy/move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  DefaultConstructor() {}
 };
 
-class DefinesDefaultedVirtualDestructor {
-  virtual ~DefinesDefaultedVirtualDestructor() = default;
+class DefaultConstructorDefaulted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a default constructor is declared, a copy/move constructor, a copy/move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  DefaultConstructorDefaulted() = default;
 };
 
-class DefinesCopyConstructor {
-  DefinesCopyConstructor(const DefinesCopyConstructor &);
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesCopyConstructor' defines a copy constructor but does not define a destructor, a copy assignment operator, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DefinesDefaultedCopyConstructor {
-  DefinesDefaultedCopyConstructor(const DefinesDefaultedCopyConstructor &) = default;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesDefaultedCopyConstructor' defines a copy constructor but does not define a destructor, a copy assignment operator, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DefinesCopyAssignment {
-  DefinesCopyAssignment &operator=(const DefinesCopyAssignment &);
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesCopyAssignment' defines a copy assignment operator but does not define a destructor, a copy constructor, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DefinesDefaultedCopyAssignment {
-  DefinesDefaultedCopyAssignment &operator=(const DefinesDefaultedCopyAssignment &) = default;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesDefaultedCopyAssignment' defines a copy assignment operator but does not define a destructor, a copy constructor, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DefinesMoveConstructor {
-  DefinesMoveConstructor(DefinesMoveConstructor &&);
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesMoveConstructor' defines a move constructor but does not define a destructor, a copy constructor, a copy assignment operator or a move assignment operator [bsl-special-member-functions]
-
-class DefinesDefaultedMoveConstructor {
-  DefinesDefaultedMoveConstructor(DefinesDefaultedMoveConstructor &&) = default;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesDefaultedMoveConstructor' defines a move constructor but does not define a destructor, a copy constructor, a copy assignment operator or a move assignment operator [bsl-special-member-functions]
-
-class DefinesMoveAssignment {
-  DefinesMoveAssignment &operator=(DefinesMoveAssignment &&);
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesMoveAssignment' defines a move assignment operator but does not define a destructor, a copy constructor, a copy assignment operator or a move constructor [bsl-special-member-functions]
-
-class DefinesDefaultedMoveAssignment {
-  DefinesDefaultedMoveAssignment &operator=(DefinesDefaultedMoveAssignment &&) = default;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DefinesDefaultedMoveAssignment' defines a move assignment operator but does not define a destructor, a copy constructor, a copy assignment operator or a move constructor [bsl-special-member-functions]
-
-
-class DeleteConstructor {
-  DeleteConstructor() = delete;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DeleteConstructor' defines a default constructor but does not define a destructor, a copy constructor, a copy assignment operator, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DeleteDestructor {
-  ~DeleteDestructor() = delete;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DeleteDestructor' defines a non-default destructor but does not define a copy constructor, a copy assignment operator, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DeleteCopyConstructor {
-  DeleteCopyConstructor(const DeleteCopyConstructor &) = delete;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DeleteCopyConstructor' defines a copy constructor but does not define a destructor, a copy assignment operator, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DeleteMoveConstructor {
-  DeleteMoveConstructor(DeleteMoveConstructor &&) = delete;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DeleteMoveConstructor' defines a move constructor but does not define a destructor, a copy constructor, a copy assignment operator or a move assignment operator [bsl-special-member-functions]
-
-class DeleteCopyAssignment {
-  DeleteCopyAssignment &operator=(const DeleteCopyAssignment &) = delete;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DeleteCopyAssignment' defines a copy assignment operator but does not define a destructor, a copy constructor, a move constructor or a move assignment operator [bsl-special-member-functions]
-
-class DeleteMoveAssignment {
-  DeleteMoveAssignment &operator=(DeleteMoveAssignment &&) = delete;
-};
-// CHECK-MESSAGES: [[@LINE-3]]:7: warning: class 'DeleteMoveAssignment' defines a move assignment operator but does not define a destructor, a copy constructor, a copy assignment operator or a move constructor [bsl-special-member-functions]
-
-
-class DefinesNothing {
+class DefaultConstructorDeleted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a default constructor is declared, a copy/move constructor, a copy/move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  DefaultConstructorDeleted() = delete;
 };
 
-class DefinesEverything {
-  DefinesEverything(const DefinesEverything &);
-  DefinesEverything &operator=(const DefinesEverything &);
-  DefinesEverything(DefinesEverything &&);
-  DefinesEverything &operator=(DefinesEverything &&);
-  ~DefinesEverything();
+class CopyConstructor {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a copy constructor is declared, a move constructor, a copy/move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  CopyConstructor(CopyConstructor const &o) {}
 };
 
-class DeletesEverything {
-  DeletesEverything(const DeletesEverything &) = delete;
-  DeletesEverything &operator=(const DeletesEverything &) = delete;
-  DeletesEverything(DeletesEverything &&) = delete;
-  DeletesEverything &operator=(DeletesEverything &&) = delete;
-  ~DeletesEverything() = delete;
+class CopyConstructorDefaulted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a copy constructor is declared, a move constructor, a copy/move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  CopyConstructorDefaulted(CopyConstructorDefaulted const &o) = default;
 };
 
-class DeletesCopyDefaultsMove {
-  DeletesCopyDefaultsMove(const DeletesCopyDefaultsMove &) = delete;
-  DeletesCopyDefaultsMove &operator=(const DeletesCopyDefaultsMove &) = delete;
-  DeletesCopyDefaultsMove(DeletesCopyDefaultsMove &&) = default;
-  DeletesCopyDefaultsMove &operator=(DeletesCopyDefaultsMove &&) = default;
-  ~DeletesCopyDefaultsMove() = default;
+class CopyConstructorDeleted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a copy constructor is declared, a move constructor, a copy/move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  CopyConstructorDeleted(CopyConstructorDeleted const &o) = delete;
 };
 
-template <typename T>
-struct TemplateClass {
-  TemplateClass() = default;
-  TemplateClass(const TemplateClass &);
-  TemplateClass &operator=(const TemplateClass &);
-  TemplateClass(TemplateClass &&);
-  TemplateClass &operator=(TemplateClass &&);
-  ~TemplateClass();
+class MoveConstructor {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a move constructor is declared, a copy constructor, a copy/move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  MoveConstructor(MoveConstructor &&o) {}
 };
 
-// Multiple instantiations of a class template will trigger multiple matches for defined special members.
-// This should not cause problems.
-TemplateClass<int> InstantiationWithInt;
-TemplateClass<double> InstantiationWithDouble;
+class MoveConstructorDefaulted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a move constructor is declared, a copy constructor, a copy/move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  MoveConstructorDefaulted(MoveConstructorDefaulted &&o) = default;
+};
+
+class MoveConstructorDeleted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a move constructor is declared, a copy constructor, a copy/move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  MoveConstructorDeleted(MoveConstructorDeleted &&o) = delete;
+};
+
+class CopyAssignment {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a copy assignment operator is declared, a copy/move constructor, a move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  CopyAssignment &operator=(CopyAssignment const &o) {}
+};
+
+class CopyAssignmentDefaulted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a copy assignment operator is declared, a copy/move constructor, a move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  CopyAssignmentDefaulted &operator=(CopyAssignmentDefaulted const &o) = default;
+};
+
+class CopyAssignmentDeleted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a copy assignment operator is declared, a copy/move constructor, a move assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  CopyAssignmentDeleted &operator=(CopyAssignmentDeleted const &o) = delete;
+};
+
+class MoveAssignment {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a move assignment operator is declared, a copy/move constructor, a copy assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  MoveAssignment &operator=(MoveAssignment &&o) {}
+};
+
+class MoveAssignmentDefaulted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a move assignment operator is declared, a copy/move constructor, a copy assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  MoveAssignmentDefaulted &operator=(MoveAssignmentDefaulted &&o) = default;
+};
+
+class MoveAssignmentDeleted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a move assignment operator is declared, a copy/move constructor, a copy assignment operator and a destructor must also be provided [bsl-special-member-functions]
+  MoveAssignmentDeleted &operator=(MoveAssignmentDeleted &&o) = delete;
+};
+
+class Destructor {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a destructor is declared, a copy/move constructor and a copy/move assignment operator must also be provided [bsl-special-member-functions]
+  ~Destructor() {}
+};
+
+class DestructorDefaulted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a destructor is declared, a copy/move constructor and a copy/move assignment operator must also be provided [bsl-special-member-functions]
+  ~DestructorDefaulted() = default;
+};
+
+class DestructorDeleted {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a destructor is declared, a copy/move constructor and a copy/move assignment operator must also be provided [bsl-special-member-functions]
+  ~DestructorDeleted() = delete;
+};
+
+class DestructorVirtual {
+// CHECK-MESSAGES: [[@LINE-1]]:7: warning: if a destructor is declared, a copy/move constructor and a copy/move assignment operator must also be provided [bsl-special-member-functions]
+  virtual ~DestructorVirtual() {}
+};
+
+class Success {
+  ~Success() {}
+  Success(Success const &o) {}
+  Success(Success &&o) {}
+  Success &operator=(Success const &o) {}
+  Success &operator=(Success &&o) {}
+};
+
+class SuccessDefaulted {
+  ~SuccessDefaulted() = default;
+  SuccessDefaulted(SuccessDefaulted const &o) = default;
+  SuccessDefaulted(SuccessDefaulted &&o) = default;
+  SuccessDefaulted &operator=(SuccessDefaulted const &o) = default;
+  SuccessDefaulted &operator=(SuccessDefaulted &&o) = default;
+};
+
+class SuccessDeleted {
+  ~SuccessDeleted() = delete;
+  SuccessDeleted(SuccessDeleted const &o) = delete;
+  SuccessDeleted(SuccessDeleted &&o) = delete;
+  SuccessDeleted &operator=(SuccessDeleted const &o) = delete;
+  SuccessDeleted &operator=(SuccessDeleted &&o) = delete;
+};
+
+class SuccessWithDefaultCtor {
+  SuccessWithDefaultCtor() {}
+  ~SuccessWithDefaultCtor() {}
+  SuccessWithDefaultCtor(SuccessWithDefaultCtor const &o) {}
+  SuccessWithDefaultCtor(SuccessWithDefaultCtor &&o) {}
+  SuccessWithDefaultCtor &operator=(SuccessWithDefaultCtor const &o) {}
+  SuccessWithDefaultCtor &operator=(SuccessWithDefaultCtor &&o) {}
+};
+
+class SuccessWithDefaultCtorDefaulted {
+  SuccessWithDefaultCtorDefaulted() = default;
+  ~SuccessWithDefaultCtorDefaulted() = default;
+  SuccessWithDefaultCtorDefaulted(SuccessWithDefaultCtorDefaulted const &o) = default;
+  SuccessWithDefaultCtorDefaulted(SuccessWithDefaultCtorDefaulted &&o) = default;
+  SuccessWithDefaultCtorDefaulted &operator=(SuccessWithDefaultCtorDefaulted const &o) = default;
+  SuccessWithDefaultCtorDefaulted &operator=(SuccessWithDefaultCtorDefaulted &&o) = default;
+};
+
+class SuccessWithDefaultCtorDeleted {
+  SuccessWithDefaultCtorDeleted() = delete;
+  ~SuccessWithDefaultCtorDeleted() = delete;
+  SuccessWithDefaultCtorDeleted(SuccessWithDefaultCtorDeleted const &o) = delete;
+  SuccessWithDefaultCtorDeleted(SuccessWithDefaultCtorDeleted &&o) = delete;
+  SuccessWithDefaultCtorDeleted &operator=(SuccessWithDefaultCtorDeleted const &o) = delete;
+  SuccessWithDefaultCtorDeleted &operator=(SuccessWithDefaultCtorDeleted &&o) = delete;
+};
+
+class SuccessWithVirtualDestructor {
+  SuccessWithVirtualDestructor() {}
+  virtual ~SuccessWithVirtualDestructor() {}
+  SuccessWithVirtualDestructor(SuccessWithVirtualDestructor const &o) {}
+  SuccessWithVirtualDestructor(SuccessWithVirtualDestructor &&o) {}
+  SuccessWithVirtualDestructor &operator=(SuccessWithVirtualDestructor const &o) {}
+  SuccessWithVirtualDestructor &operator=(SuccessWithVirtualDestructor &&o) {}
+};

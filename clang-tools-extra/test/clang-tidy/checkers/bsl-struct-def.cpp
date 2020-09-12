@@ -35,7 +35,7 @@ class Aclass : T {
 private:
   int i;
   int j;
-  Aclass(int i){}; 
+  Aclass(int i){};
   virtual void foo();
 };
 
@@ -98,3 +98,15 @@ struct S12 final {
 struct S13 final {
   S13() = delete;
 };
+
+template<typename T>
+struct S14
+// CHECK-MESSAGES: :[[@LINE-1]]:8: warning: struct must be defined as final; cannot be base of another struct or class [bsl-struct-def]
+{};
+
+template<typename T>
+struct S15 final
+{};
+
+S14<bool> test1;
+S15<bool> test2;

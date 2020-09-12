@@ -153,12 +153,22 @@ New checks
   Warns if destructor of base class is not public virtual, public override,
   or protected non-virtual, unless public destructor is non-virtual in final class.
 
+- New :doc:`bsl-documentation
+  <clang-tidy/checks/bsl-documentation>` check.
+
+  Warns when documentation is missing
+
 - New :doc:`bsl-else-required-after-if
   <clang-tidy/checks/bsl-else-required-after-if>` check.
 
   Warns if else/bsl::touch is missing in certain situations. This will also
   warn if else is used when it shouldn't be, which would prevent the above
   checks from working correctly.
+
+- New :doc:`bsl-empty-if-else
+  <clang-tidy/checks/bsl-empty-if-else>` check.
+
+  Warns if an if, else-if or else statement is empty.
 
 - New :doc:`bsl-explicit-constructor
   <clang-tidy/checks/bsl-explicit-constructor>` check.
@@ -188,6 +198,11 @@ New checks
 
   Checks that different identifiers are typographically unambiguous.
 
+- New :doc:`bsl-implicit-conversions-forbidden
+  <clang-tidy/checks/bsl-implicit-conversions-forbidden>` check.
+
+  Warns of any implicit conversion
+
 - New :doc:`bsl-lambda-implicit-capture
   <clang-tidy/checks/bsl-lambda-implicit-capture>` check.
 
@@ -208,6 +223,16 @@ New checks
 
   Warns on usage of user-defined literals.
 
+- New :doc:`bsl-name-case
+  <clang-tidy/checks/bsl-name-case>` check.
+
+  Warns when a named declaration is in the wrong case
+
+- New :doc:`bsl-name-prefixes
+  <clang-tidy/checks/bsl-name-prefixes>` check.
+
+  Warns if a variable does not have the correct prefix in it's name
+
 - New :doc:`bsl-namespace-global
   <clang-tidy/checks/bsl-namespace-global>` check.
 
@@ -224,6 +249,11 @@ New checks
 
   Warns when member data in non-POD class type is not private and on non-POD types
   not defined as class
+
+- New :doc:`bsl-non-safe-integral-types-are-forbidden
+  <clang-tidy/checks/bsl-non-safe-integral-types-are-forbidden>` check.
+
+  Warns if you try to use an integral type instead of a safe_integral
 
 - New :doc:`bsl-op-bitwise-operands
   <clang-tidy/checks/bsl-op-bitwise-operands>` check.
@@ -261,7 +291,7 @@ New checks
 - New :doc:`bsl-op-relational-return-bool
   <clang-tidy/checks/bsl-op-relational-return-bool>` check.
 
-  FIXME: add release notes.
+  Warns if a comparison operator does not return a bool
 
 - New :doc:`bsl-pure-override
   <clang-tidy/checks/bsl-pure-override>` check.
@@ -316,6 +346,12 @@ New checks
 
   Warns if you use the ternary operator
 
+- New :doc:`bsl-user-defined-type-names-match-header-name
+  <clang-tidy/checks/bsl-user-defined-type-names-match-header-name>` check.
+
+  Warns if a user defined type does not have the same name as the header
+  it is defined in.
+
 - New :doc:`bsl-using-decl-scope
   <clang-tidy/checks/bsl-using-decl-scope>` check.
 
@@ -325,7 +361,12 @@ New checks
 - New :doc:`bsl-using-ident-unique-namespace
   <clang-tidy/checks/bsl-using-ident-unique-namespace>` check.
 
-  FIXME: add release notes.
+  Warns if a user defined type does not have a unique namespace
+
+- New :doc:`bsl-using-namespace-forbidden
+  <clang-tidy/checks/bsl-using-namespace-forbidden>` check.
+
+  Warns if you include a "using namespace blah" in your code.
 
 - New :doc:`bsl-var-braced-init
   <clang-tidy/checks/bsl-var-braced-init>` check.

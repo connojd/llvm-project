@@ -27,7 +27,7 @@ void AutoTypeUsageCheck::registerMatchers(MatchFinder *Finder) {
       valueDecl(hasType(autoType()), hasDescendant(cxxStdInitializerListExpr()))
           .bind("list"),
       this);
-  
+
   Finder->addMatcher(valueDecl(hasType(autoType()), isFundamentalType(),
                                unless(has(callExpr())))
                          .bind("decl"),
@@ -52,7 +52,7 @@ void AutoTypeUsageCheck::check(const MatchFinder::MatchResult &Result) {
          "auto cannot be used to declare variable of fundamental type");
 
   const auto *MatchedTempDecl = Result.Nodes.getNodeAs<FunctionDecl>("trail");
-  if (MatchedTempDecl) {
+  if (MatchedTempDecl && !MatchedTempDecl->getReturnType()->isVoidType()) {
     if (isa<CXXMethodDecl>(MatchedTempDecl)) {
       if (!cast<CXXMethodDecl>(MatchedTempDecl)->isLambdaStaticInvoker())
         diag(MatchedTempDecl->getLocation(),

@@ -22,7 +22,9 @@
 #include "ConstObjStdMoveCheck.h"
 #include "DeclForbiddenCheck.h"
 #include "DestructorAccessSpecifierCheck.h"
+#include "DocumentationCheck.h"
 #include "ElseRequiredAfterIfCheck.h"
+#include "EmptyIfElseCheck.h"
 #include "EnumExplicitCheck.h"
 #include "EnumInitCheck.h"
 #include "EnumScopedCheck.h"
@@ -32,6 +34,7 @@
 #include "FunctionNameUseCheck.h"
 #include "FunctionNoexceptCheck.h"
 #include "IdentifierTypographicallyUnambiguousCheck.h"
+#include "ImplicitConversionsForbiddenCheck.h"
 #include "LambdaImplicitCaptureCheck.h"
 #include "LambdaParamListCheck.h"
 #include "LiteralsAsciiOnlyCheck.h"
@@ -39,10 +42,13 @@
 #include "LiteralsNoOctalCheck.h"
 #include "LiteralsUnsignedSuffixCheck.h"
 #include "LiteralsUserDefinedCheck.h"
+#include "NameCaseCheck.h"
+#include "NamePrefixesCheck.h"
 #include "NamespaceGlobalCheck.h"
 #include "NodiscardCheck.h"
 #include "NonPodClassdefCheck.h"
 #include "NonPodStaticCheck.h"
+#include "NonSafeIntegralTypesAreForbiddenCheck.h"
 #include "OpBitwiseOperandsCheck.h"
 #include "OpConditionalSubexprCheck.h"
 #include "OpEqualityVirtMemfnNullptrCheck.h"
@@ -62,8 +68,10 @@
 #include "TypesFixedWidthIntsCheck.h"
 #include "TypesNoWideCharCheck.h"
 #include "UnusedReturnValueCheck.h"
+#include "UserDefinedTypeNamesMatchHeaderNameCheck.h"
 #include "UsingDeclScopeCheck.h"
 #include "UsingIdentUniqueNamespaceCheck.h"
+#include "UsingNamespaceForbiddenCheck.h"
 #include "VarBracedInitCheck.h"
 
 namespace clang {
@@ -99,8 +107,12 @@ public:
         "bsl-decl-forbidden");
     CheckFactories.registerCheck<DestructorAccessSpecifierCheck>(
         "bsl-destructor-access-specifier");
+    CheckFactories.registerCheck<DocumentationCheck>(
+        "bsl-documentation");
     CheckFactories.registerCheck<ElseRequiredAfterIfCheck>(
         "bsl-else-required-after-if");
+    CheckFactories.registerCheck<EmptyIfElseCheck>(
+        "bsl-empty-if-else");
     CheckFactories.registerCheck<EnumExplicitCheck>(
         "bsl-enum-explicit");
     CheckFactories.registerCheck<EnumInitCheck>(
@@ -119,6 +131,8 @@ public:
         "bsl-function-noexcept");
     CheckFactories.registerCheck<IdentifierTypographicallyUnambiguousCheck>(
         "bsl-identifier-typographically-unambiguous");    
+    CheckFactories.registerCheck<ImplicitConversionsForbiddenCheck>(
+        "bsl-implicit-conversions-forbidden");
     CheckFactories.registerCheck<LambdaImplicitCaptureCheck>(
         "bsl-lambda-implicit-capture");
     CheckFactories.registerCheck<LambdaParamListCheck>(
@@ -127,6 +141,10 @@ public:
         "bsl-literals-digit-separator");
     CheckFactories.registerCheck<LiteralsUserDefinedCheck>(
         "bsl-literals-user-defined");
+    CheckFactories.registerCheck<NameCaseCheck>(
+        "bsl-name-case");
+    CheckFactories.registerCheck<NamePrefixesCheck>(
+        "bsl-name-prefixes");
     CheckFactories.registerCheck<NamespaceGlobalCheck>(
         "bsl-namespace-global");
     CheckFactories.registerCheck<NodiscardCheck>(
@@ -135,6 +153,8 @@ public:
         "bsl-non-pod-classdef");
     CheckFactories.registerCheck<NonPodStaticCheck>(
         "bsl-non-pod-static");
+    CheckFactories.registerCheck<NonSafeIntegralTypesAreForbiddenCheck>(
+        "bsl-non-safe-integral-types-are-forbidden");
     CheckFactories.registerCheck<OpBitwiseOperandsCheck>(
         "bsl-op-bitwise-operands");
     CheckFactories.registerCheck<OpConditionalSubexprCheck>(
@@ -179,10 +199,14 @@ public:
         "bsl-types-no-wide-char");
     CheckFactories.registerCheck<UnusedReturnValueCheck>(
         "bsl-unused-return-value");
+    CheckFactories.registerCheck<UserDefinedTypeNamesMatchHeaderNameCheck>(
+        "bsl-user-defined-type-names-match-header-name");
     CheckFactories.registerCheck<UsingDeclScopeCheck>(
         "bsl-using-decl-scope");
     CheckFactories.registerCheck<UsingIdentUniqueNamespaceCheck>(
         "bsl-using-ident-unique-namespace");
+    CheckFactories.registerCheck<UsingNamespaceForbiddenCheck>(
+        "bsl-using-namespace-forbidden");
     CheckFactories.registerCheck<VarBracedInitCheck>(
         "bsl-var-braced-init");
   }

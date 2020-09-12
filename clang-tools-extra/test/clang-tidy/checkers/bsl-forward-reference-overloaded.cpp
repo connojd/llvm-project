@@ -1,71 +1,197 @@
 // RUN: %check_clang_tidy %s bsl-forward-reference-overloaded %t
 
-template <typename T> void f1(T &&t) {}
+void fucntionWithForwardReference1(int i)
+{}
 
-// Overloading a function with forwarding reference
-void f1(int &&t) {} // Non-compliant
-// CHECK-MESSAGES: [[@LINE-1]]:6: warning: function f1 overloads function declaration with forwarding reference on line 3 [bsl-forward-reference-overloaded]
+template<typename T>
+void fucntionWithForwardReference1(T &&t)
+// CHECK-MESSAGES: :[[@LINE-1]]:40:  warning: A function that contains an ambiguous forwarding reference as an argument shall not be overloaded. [bsl-forward-reference-overloaded]
+{}
 
-void f1(int x, int &&t) {} // Compliant
+void fucntionWithForwardReference2(int i, int j)
+{}
 
-template <typename T> void f1(T &&t, int a, int b) {} // Compliant
+template<typename T>
+void fucntionWithForwardReference2(int i, T &&t)
+// CHECK-MESSAGES: :[[@LINE-1]]:47:  warning: A function that contains an ambiguous forwarding reference as an argument shall not be overloaded. [bsl-forward-reference-overloaded]
+{}
 
-template <typename T> void f2(T &&t) {}
+void fucntionWithForwardReference3(int i, int j, int k)
+{}
 
-void f2(int &) = delete; // Compliant by exception
+template<typename T>
+void fucntionWithForwardReference3(int i, T &&t, int k)
+// CHECK-MESSAGES: :[[@LINE-1]]:47:  warning: A function that contains an ambiguous forwarding reference as an argument shall not be overloaded. [bsl-forward-reference-overloaded]
+{}
 
-template <typename T> void f3(T &&t, int a, int b) {} // Compliant
+void fucntionWithForwardReference4(int i, int j, int k)
+{}
 
-template <typename T>
-void f3(T &&t, T &&y, int b) {} // Non-compliant, same number of params
-// CHECK-MESSAGES: [[@LINE-1]]:6: warning: function f3 overloads function declaration with forwarding reference on line 17 [bsl-forward-reference-overloaded]
+template<typename T>
+void fucntionWithForwardReference4(int i, T &&t, bool b)
+{}
 
-class A {
-  template <typename T> void f1(T &&t) {}
+void fucntionWithForwardReference5(int i, int j)
+{}
 
-  void f1(int &&t) {} // Non-compliant
-  // CHECK-MESSAGES: [[@LINE-1]]:8: warning: function A::f1 overloads function declaration with forwarding reference on line 24 [bsl-forward-reference-overloaded]
+template<typename T, typename U>
+void fucntionWithForwardReference5(T &&t, U &&u)
+// CHECK-MESSAGES: :[[@LINE-1]]:47:  warning: A function that contains an ambiguous forwarding reference as an argument shall not be overloaded. [bsl-forward-reference-overloaded]
+{}
 
-  template <typename T> void f2(T &&t) {}
+template<typename T>
+void fucntionWithForwardReference6(T &&t)
+{}
 
-  void f2(int &) = delete; // Compliant by deletion
+template<typename T, typename U>
+void fucntionWithForwardReference7(T &&t, U &&u)
+{}
 
-  // Ignore move and copy
-  A( const A& other);
-  A& operator=(const A& other);
-  A(A&& other);
-  A& operator=(A&& other);
+void fucntionWithForwardReference8(int i)
+{}
+
+template<typename T>
+void fucntionWithForwardReference9(int i, T &&t)
+{}
+
+template<typename T, typename U>
+void fucntionWithForwardReference9(int i, T &&t, U &&u)
+{}
+
+void fucntionWithForwardReference10(int i)
+{}
+
+template<typename T>
+void fucntionWithForwardReference10(T &t)
+{}
+
+template<typename T>
+void fucntionWithForwardReference10(T const &t)
+{}
+
+template<typename T>
+void fucntionWithForwardReference10(T const &&t)
+{}
+
+template<typename T>
+void fucntionWithForwardReference10(int &i)
+{}
+
+template<typename T>
+void fucntionWithForwardReference10(int const &i)
+{}
+
+template<typename T>
+void fucntionWithForwardReference10(int &&i)
+{}
+
+template<typename T>
+void fucntionWithForwardReference10(int const &&i)
+{}
+
+class classWithForwardReference1
+{
+public:
+  classWithForwardReference1(int i)
+  {}
+
+  template<typename T>
+  classWithForwardReference1(T &&t)
+  // CHECK-MESSAGES: :[[@LINE-1]]:34:  warning: A function that contains an ambiguous forwarding reference as an argument shall not be overloaded. [bsl-forward-reference-overloaded]
+  {}
 };
 
-// Not forward references
-void f4(A &&a) {}
+class classWithForwardReference2
+{
+public:
+  classWithForwardReference2(int i, int j)
+  {}
 
-void f4(int &) = delete; // Compliant
+  template<typename T, typename U>
+  classWithForwardReference2(T &&t, U &&u)
+  // CHECK-MESSAGES: :[[@LINE-1]]:41:  warning: A function that contains an ambiguous forwarding reference as an argument shall not be overloaded. [bsl-forward-reference-overloaded]
+  {}
+};
 
-void f5(A &&a) {}
+class classWithForwardReference3
+{
+public:
+  template<typename T>
+  classWithForwardReference3(T &&t)
+  {}
+};
 
-void f5(int &&a) {} // Compliant
+class classWithForwardReference4
+{
+public:
+  template<typename T, typename U>
+  classWithForwardReference4(T &&t, U &&u)
+  {}
+};
 
-namespace n1 {
-void f1(int &&t) {} // Non-compliant with f1(T &&t)
-// CHECK-MESSAGES: [[@LINE-1]]:6: warning: function n1::f1 overloads function declaration with forwarding reference on line 55 [bsl-forward-reference-overloaded]
+class classWithForwardReference5
+{
+public:
+  template<typename T, typename U>
+  classWithForwardReference5(int i, T &&t, U &&u)
+  {}
+};
 
-void f1(int x, int &&t) {} // Compliant
+class classWithForwardReference6
+{
+public:
+  classWithForwardReference6(int i)
+  {}
 
-template <typename T> void f1(T &&t) {}
+  template<typename T>
+  classWithForwardReference6(T &t)
+  {}
 
-void f1(long &&t) {} // Non-compliant with f1(T &&t)
-// CHECK-MESSAGES: [[@LINE-1]]:6: warning: function n1::f1 overloads function declaration with forwarding reference on line 55 [bsl-forward-reference-overloaded]
+  template<typename T>
+  classWithForwardReference6(T const &t)
+  {}
 
-template <typename T> void f1(T &&t, int a, int b) {} // Compliant
+  template<typename T>
+  classWithForwardReference6(T const &&t)
+  {}
 
-template <typename T> void f2(T &&t) {}
+  template<typename T>
+  classWithForwardReference6(int &i)
+  {}
 
-void f2(int &) = delete; // Compliant by deletion
+  template<typename T>
+  classWithForwardReference6(int const &i)
+  {}
 
-template <typename T> void f3(T &&t, int a, int b) {} // Compliant
+  template<typename T>
+  classWithForwardReference6(int &&i)
+  {}
 
-template <typename T>
-void f3(T &&t, T &&y, int b) {} // Non-compliant, same number of params
-// CHECK-MESSAGES: [[@LINE-1]]:6: warning: function n1::f3 overloads function declaration with forwarding reference on line 66 [bsl-forward-reference-overloaded]
-} // namespace n1
+  template<typename T>
+  classWithForwardReference6(int const &&i)
+  {}
+};
+
+template<typename T>
+class classWithForwardReference7
+{
+public:
+  classWithForwardReference7(int i)
+  {}
+
+  classWithForwardReference7(T &&t)
+  {}
+};
+
+template<typename T>
+class classWithForwardReference8
+{
+public:
+  classWithForwardReference8(int i)
+  {}
+
+  template<typename U>
+  classWithForwardReference8(U &&u)
+  // CHECK-MESSAGES: :[[@LINE-1]]:34:  warning: A function that contains an ambiguous forwarding reference as an argument shall not be overloaded. [bsl-forward-reference-overloaded]
+  {}
+};
