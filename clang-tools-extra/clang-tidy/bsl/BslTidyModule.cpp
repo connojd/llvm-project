@@ -22,6 +22,7 @@
 #include "ConstObjStdMoveCheck.h"
 #include "DeclForbiddenCheck.h"
 #include "DestructorAccessSpecifierCheck.h"
+#include "DocumentationCheck.h"
 #include "ElseRequiredAfterIfCheck.h"
 #include "EmptyIfElseCheck.h"
 #include "EnumExplicitCheck.h"
@@ -106,6 +107,8 @@ public:
         "bsl-decl-forbidden");
     CheckFactories.registerCheck<DestructorAccessSpecifierCheck>(
         "bsl-destructor-access-specifier");
+    CheckFactories.registerCheck<DocumentationCheck>(
+        "bsl-documentation");
     CheckFactories.registerCheck<ElseRequiredAfterIfCheck>(
         "bsl-else-required-after-if");
     CheckFactories.registerCheck<EmptyIfElseCheck>(

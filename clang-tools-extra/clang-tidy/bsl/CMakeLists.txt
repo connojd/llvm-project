@@ -16,6 +16,7 @@ add_clang_library(clangTidyBslModule
   ConstObjStdMoveCheck.cpp
   DeclForbiddenCheck.cpp
   DestructorAccessSpecifierCheck.cpp
+  DocumentationCheck.cpp
   ElseRequiredAfterIfCheck.cpp
   EmptyIfElseCheck.cpp
   EnumExplicitCheck.cpp

@@ -58,6 +58,7 @@ Clang-Tidy Checks
    `bsl-copy-move-access-specifier <bsl-copy-move-access-specifier.html>`_,
    `bsl-decl-forbidden <bsl-decl-forbidden.html>`_,
    `bsl-destructor-access-specifier <bsl-destructor-access-specifier.html>`_,
+   `bsl-documentation <bsl-documentation.html>`_, "Yes"
    `bsl-else-required-after-if <bsl-else-required-after-if.html>`_,
    `bsl-empty-if-else <bsl-empty-if-else.html>`_,
    `bsl-enum-explicit <bsl-enum-explicit.html>`_,
@@ -105,7 +106,7 @@ Clang-Tidy Checks
    `bsl-user-defined-type-names-match-header-name <bsl-user-defined-type-names-match-header-name.html>`_,
    `bsl-using-decl-scope <bsl-using-decl-scope.html>`_,
    `bsl-using-ident-unique-namespace <bsl-using-ident-unique-namespace.html>`_,
-   `bsl-using-namespace-forbidden <bsl-using-namespace-forbidden.html>`_, "Yes"
+   `bsl-using-namespace-forbidden <bsl-using-namespace-forbidden.html>`_,
    `bsl-var-braced-init <bsl-var-braced-init.html>`_,
    `bugprone-argument-comment <bugprone-argument-comment.html>`_, "Yes"
    `bugprone-assert-side-effect <bugprone-assert-side-effect.html>`_,

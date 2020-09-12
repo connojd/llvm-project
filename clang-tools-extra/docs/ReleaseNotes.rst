@@ -153,6 +153,11 @@ New checks
   Warns if destructor of base class is not public virtual, public override,
   or protected non-virtual, unless public destructor is non-virtual in final class.
 
+- New :doc:`bsl-documentation
+  <clang-tidy/checks/bsl-documentation>` check.
+
+  Warns when documentation is missing
+
 - New :doc:`bsl-else-required-after-if
   <clang-tidy/checks/bsl-else-required-after-if>` check.
 
