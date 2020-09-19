@@ -58,6 +58,7 @@ Clang-Tidy Checks
    `bsl-const-obj-std-move <bsl-const-obj-std-move.html>`_,
    `bsl-copy-move-access-specifier <bsl-copy-move-access-specifier.html>`_,
    `bsl-decl-forbidden <bsl-decl-forbidden.html>`_,
+   `bsl-dependent-base-name <bsl-dependent-base-name.html>`_, "Yes"
    `bsl-destructor-access-specifier <bsl-destructor-access-specifier.html>`_,
    `bsl-else-required-after-if <bsl-else-required-after-if.html>`_,
    `bsl-enum-explicit <bsl-enum-explicit.html>`_,
