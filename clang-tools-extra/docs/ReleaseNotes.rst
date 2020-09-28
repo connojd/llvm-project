@@ -147,6 +147,14 @@ New checks
 
   Warns if unions or bitfields are declared.
 
+- New :doc:`bsl-dependent-base-name
+  <clang-tidy/checks/bsl-dependent-base-name>` check.
+
+  Warns whenever an unqualified, non-dependent name is used in a class template
+  such that 1) the class template has a dependent base class that declares the
+  same name and 2) an enclosing scope of the class template also declares the same
+  name.
+
 - New :doc:`bsl-destructor-access-specifier
   <clang-tidy/checks/bsl-destructor-access-specifier>` check.
 

@@ -21,6 +21,7 @@
 #include "CopyMoveAccessSpecifierCheck.h"
 #include "ConstObjStdMoveCheck.h"
 #include "DeclForbiddenCheck.h"
+#include "DependentBaseNameCheck.h"
 #include "DestructorAccessSpecifierCheck.h"
 #include "DocumentationCheck.h"
 #include "ElseRequiredAfterIfCheck.h"
@@ -105,6 +106,8 @@ public:
         "bsl-const-obj-std-move");
     CheckFactories.registerCheck<DeclForbiddenCheck>(
         "bsl-decl-forbidden");
+    CheckFactories.registerCheck<DependentBaseNameCheck>(
+        "bsl-dependent-base-name");
     CheckFactories.registerCheck<DestructorAccessSpecifierCheck>(
         "bsl-destructor-access-specifier");
     CheckFactories.registerCheck<DocumentationCheck>(
